@@ -1,23 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import PropTypes from 'prop-types';
 
-interface HeaderProps {
-  title?: string;
-}
-
-interface NavLink {
-  path: string;
-  label: string;
-  ariaLabel: string;
-}
-
-const Header: React.FC<HeaderProps> = ({ title = "Fight Simulation App" }) => {
+const Header = ({ title = "Fight Simulation App" }) => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
-  const navLinks: NavLink[] = [
+  const navLinks = [
     { path: '/', label: 'Home', ariaLabel: 'Go to Home' },
     { path: '/fights', label: 'Simulate a Fight', ariaLabel: 'Simulate a Fight' },
     { path: '/leaderboards', label: 'Leaderboard', ariaLabel: 'View Leaderboard' },
@@ -119,6 +110,10 @@ const Header: React.FC<HeaderProps> = ({ title = "Fight Simulation App" }) => {
       </div>
     </header>
   );
+};
+
+Header.propTypes = {
+  title: PropTypes.string
 };
 
 export default Header;
