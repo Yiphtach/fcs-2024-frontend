@@ -1,0 +1,186 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, Swords } from 'lucide-react';
+
+interface Character {
+  _id: string;
+  name: string;
+  imageUrl: string;
+  universe: string;
+  stats: {
+    strength: number;
+    speed: number;
+    intelligence: number;
+    durability: number;
+  };
+}
+
+interface CharacterSelectionProps {
+  characters: Character[];
+  universe: string;
+}
+
+const CharacterSelection: React.FC<CharacterSelectionProps> = ({ characters, universe }) => {
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+  const [opponentCharacter, setOpponentCharacter] = useState<Character | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const filteredCharacters = characters.filter(char => 
+    char.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleCharacterSelect = (character: Character) => {
+    setSelectedCharacter(character);
+    // Reset opponent if they selected the same character
+    if (opponentCharacter?._id === character._id) {
+      setOpponentCharacter(null);
+    }
+  };
+
+  const handleOpponentSelect = (character: Character) => {
+    setOpponentCharacter(character);
+  };
+
+  const handleStartFight = () => {
+    if (selectedCharacter && opponentCharacter) {
+      navigate('/fights/simulate', {
+        state: {
+          char1Id: selectedCharacter._id,
+          char2Id: opponentCharacter._id
+        }
+      });
+    }
+  };
+
+  const CharacterCard: React.FC<{ 
+    character: Character; 
+    isSelected: boolean;
+    onSelect: () => void;
+  }> = ({ character, isSelected, onSelect }) => (
+    <motion.div
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      className={`
+        relative rounded-xl overflow-hidden cursor-pointer
+        transition-all duration-300 bg-gray-800
+        ${isSelected ? 'ring-4 ring-green-400' : 'hover:ring-2 hover:ring-green-400/50'}
+      `}
+      onClick={onSelect}
+    >
+      <div className="aspect-w-3 aspect-h-4">
+        <img
+          src={character.imageUrl}
+          alt={character.name}
+          className="object-cover w-full h-full"
+        />
+      </div>
+      <div className="p-4 bg-gradient-to-t from-black/80 to-transparent absolute bottom-0 w-full">
+        <h3 className="text-xl font-bold text-white mb-2">{character.name}</h3>
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="text-green-400">STR: {character.stats.strength}</div>
+          <div className="text-blue-400">SPD: {character.stats.speed}</div>
+          <div className="text-purple-400">INT: {character.stats.intelligence}</div>
+          <div className="text-yellow-400">DUR: {character.stats.durability}</div>
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  return (
+    <motion.main
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen bg-gray-900 text-white p-8"
+    >
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button 
+            onClick={() => navigate(-1)}
+            className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            <span>Back to Universe Selection</span>
+          </button>
+          <h1 className="text-3xl font-bold">{universe} Universe</h1>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-8">
+          <input
+            type="text"
+            placeholder="Search characters..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full max-w-md px-4 py-2 rounded-lg bg-gray-800 border border-gray-700
+                     focus:ring-2 focus:ring-green-400 focus:border-transparent
+                     transition-all duration-300"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Character Selection */}
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Choose Your Character</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <AnimatePresence>
+                {filteredCharacters.map((character) => (
+                  <CharacterCard
+                    key={character._id}
+                    character={character}
+                    isSelected={selectedCharacter?._id === character._id}
+                    onSelect={() => handleCharacterSelect(character)}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Opponent Selection */}
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Choose Your Opponent</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <AnimatePresence>
+                {filteredCharacters
+                  .filter(char => char._id !== selectedCharacter?._id)
+                  .map((character) => (
+                    <CharacterCard
+                      key={character._id}
+                      character={character}
+                      isSelected={opponentCharacter?._id === character._id}
+                      onSelect={() => handleOpponentSelect(character)}
+                    />
+                  ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {/* Fight Button */}
+        {selectedCharacter && opponentCharacter && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="fixed bottom-8 left-1/2 transform -translate-x-1/2"
+          >
+            <button
+              onClick={handleStartFight}
+              className="flex items-center space-x-2 px-8 py-4 bg-green-500 text-white
+                       rounded-full text-xl font-bold hover:bg-green-600 
+                       transition-colors duration-300"
+            >
+              <Swords className="w-6 h-6" />
+              <span>Start Fight!</span>
+            </button>
+          </motion.div>
+        )}
+      </div>
+    </motion.main>
+  );
+};
+
+export default CharacterSelection;

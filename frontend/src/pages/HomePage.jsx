@@ -1,144 +1,91 @@
-// HomePage
 import React from 'react';
-import Header from '../frontend/src/components/Header';
-import Footer from '../frontend/src/components/Footer';
+import { Link } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+
+const FeatureCard = ({ title, description }) => (
+  <div className="bg-gray-100 rounded-lg p-6 text-center transform transition-transform hover:scale-105">
+    <h2 className="text-2xl font-bold mb-3">{title}</h2>
+    <p className="text-gray-700">{description}</p>
+  </div>
+);
 
 const HomePage = () => {
+  const features = [
+    {
+      title: "Simulate Fights",
+      description: "Pick your favorite characters from different universes and pit them against each other to see who wins based on their stats and abilities."
+    },
+    {
+      title: "Track Stats",
+      description: "View each character's win/loss record and other stats after every fight. Keep an eye on the leaderboard to see who dominates."
+    },
+    {
+      title: "Analyze Battles",
+      description: "Get a detailed breakdown of each fight, round by round, and see how different stats affect the outcome of the battle."
+    }
+  ];
+
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main>
+      <main className="flex-grow">
         {/* Hero Section */}
-        <section className="hero">
-          <h1>Welcome to the Fight Simulation App</h1>
-          <p>
-            Experience epic battles between your favorite comic book characters.
-            Select characters, simulate a fight, and see who comes out on top!
-          </p>
-          <a href="/fights" className="btn-start" aria-label="Start a fight simulation">
-            Start a Fight
-          </a>
+        <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20 px-4">
+          <div className="container mx-auto text-center">
+            <h1 className="text-5xl font-bold mb-6 animate-fade-in">
+              Welcome to the Fight Simulation App
+            </h1>
+            <p className="text-xl mb-8 max-w-2xl mx-auto">
+              Experience epic battles between your favorite comic book characters.
+              Select characters, simulate a fight, and see who comes out on top!
+            </p>
+            <Link 
+              to="/fights" 
+              className="inline-block bg-white text-blue-600 px-8 py-4 rounded-full font-bold hover:bg-blue-100 transition-colors"
+            >
+              Start a Fight
+            </Link>
+          </div>
         </section>
 
         {/* Features Section */}
-        <section className="features">
-          <div className="feature">
-            <h2>Simulate Fights</h2>
-            <p>
-              Pick your favorite characters from different universes and pit them against each other to see who wins based on their stats and abilities.
-            </p>
-          </div>
-          <div className="feature">
-            <h2>Track Stats</h2>
-            <p>
-              View each character's win/loss record and other stats after every fight. Keep an eye on the leaderboard to see who dominates.
-            </p>
-          </div>
-          <div className="feature">
-            <h2>Analyze Battles</h2>
-            <p>
-              Get a detailed breakdown of each fight, round by round, and see how different stats affect the outcome of the battle.
-            </p>
+        <section className="container mx-auto py-16 px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <FeatureCard 
+                key={index}
+                title={feature.title}
+                description={feature.description}
+              />
+            ))}
           </div>
         </section>
 
         {/* Additional Navigation */}
-        <section className="additional-nav">
-          <a href="/characters" className="btn-nav" aria-label="View all characters">
-            View Characters
-          </a>
-          <a href="/leaderboards" className="btn-nav" aria-label="View the leaderboard">
-            Leaderboard
-          </a>
+        <section className="bg-gray-100 py-12">
+          <div className="container mx-auto text-center">
+            <div className="space-x-6">
+              <Link 
+                to="/characters" 
+                className="inline-block bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                View Characters
+              </Link>
+              <Link 
+                to="/leaderboards" 
+                className="inline-block bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                Leaderboard
+              </Link>
+            </div>
+          </div>
         </section>
       </main>
 
       <Footer />
-
-      {/* Inline CSS Styling */}
-      <style jsx>{`
-        main {
-          padding: 20px;
-        }
-        /* Hero Section */
-        .hero {
-          text-align: center;
-          padding: 50px 0;
-          background-color: #f4f4f4;
-          margin-bottom: 30px;
-        }
-        .hero h1 {
-          font-size: 36px;
-          margin-bottom: 10px;
-        }
-        .hero p {
-          font-size: 18px;
-          margin-bottom: 20px;
-        }
-        .btn-start {
-          padding: 15px 25px;
-          background-color: #4caf50;
-          color: white;
-          text-decoration: none;
-          font-size: 18px;
-          border-radius: 5px;
-          transition: background-color 0.3s ease;
-        }
-        .btn-start:hover {
-          background-color: #45a049;
-        }
-        /* Features Section */
-        .features {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 30px;
-        }
-        .feature {
-          width: 30%;
-          padding: 20px;
-          background-color: #e9e9e9;
-          border-radius: 5px;
-          text-align: center;
-        }
-        .feature h2 {
-          font-size: 24px;
-          margin-bottom: 10px;
-        }
-        .feature p {
-          font-size: 16px;
-        }
-        /* Additional Navigation */
-        .additional-nav {
-          text-align: center;
-          margin-top: 30px;
-        }
-        .btn-nav {
-          padding: 10px 20px;
-          background-color: #333;
-          color: white;
-          text-decoration: none;
-          margin: 0 10px;
-          font-size: 16px;
-          border-radius: 5px;
-          transition: background-color 0.3s ease;
-        }
-        .btn-nav:hover {
-          background-color: #555;
-        }
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .features {
-            flex-direction: column;
-            align-items: center;
-          }
-          .feature {
-            width: 80%;
-            margin-bottom: 20px;
-          }
-        }
-      `}</style>
-    </>
+    </div>
   );
 };
 
