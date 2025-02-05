@@ -1,7 +1,7 @@
 // Leaderboard
 import React from 'react';
-import Header from '../frontend/src/components/Header';
-import Footer from '../frontend/src/components/Footer';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const Leaderboard = ({ characters, currentPage, totalPages }) => {
   return (
