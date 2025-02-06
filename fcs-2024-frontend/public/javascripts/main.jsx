@@ -134,6 +134,7 @@ const CharacterForm = ({ onSubmit }) => {
 };
 
 // Image component with lazy loading
+// eslint-disable-next-line react/prop-types
 const LazyImage = ({ src, alt, className }) => {
   return (
     <img

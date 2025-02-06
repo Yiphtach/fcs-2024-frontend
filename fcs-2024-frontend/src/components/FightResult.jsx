@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Progress } from '@/components/ui/';
 
 const FightResult = ({ char1, char2, fightResult }) => {
@@ -95,5 +96,19 @@ const FightResult = ({ char1, char2, fightResult }) => {
     </div>
   );
 };
+FightResult.propTypes = {
+  char1: PropTypes.shape({
+    name: PropTypes.string.isRequired
+  }).isRequired,
+  char2: PropTypes.shape({
+    name: PropTypes.string.isRequired
+  }).isRequired,
+  fightResult: PropTypes.shape({
+    log: PropTypes.arrayOf(PropTypes.string).isRequired,
+    initialChar1Health: PropTypes.number.isRequired,
+    initialChar2Health: PropTypes.number.isRequired
+  }).isRequired
+};
+
 
 export default FightResult;

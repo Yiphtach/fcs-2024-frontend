@@ -2,6 +2,7 @@
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import PropTypes from 'prop-types';
 
 const Leaderboard = ({ characters, currentPage, totalPages }) => {
   return (
@@ -75,7 +76,7 @@ const Leaderboard = ({ characters, currentPage, totalPages }) => {
       <Footer />
 
       {/* Inline CSS Styling (scoped globally) */}
-      <style jsx global>{`
+      <style>{`
         body {
           font-family: Arial, sans-serif;
           padding: 20px;
@@ -178,5 +179,19 @@ const Leaderboard = ({ characters, currentPage, totalPages }) => {
     </>
   );
 };
+Leaderboard.propTypes = {
+  characters: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      wins: PropTypes.number.isRequired,
+      losses: PropTypes.number.isRequired,
+      totalFights: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  currentPage: PropTypes.number.isRequired,
+  totalPages: PropTypes.number.isRequired,
+};
+
 
 export default Leaderboard;

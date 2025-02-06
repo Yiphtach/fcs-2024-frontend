@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 
 const DuplicateRemover = () => {
