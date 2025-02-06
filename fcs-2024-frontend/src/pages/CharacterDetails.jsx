@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/CharacterCard';
+import PropTypes from 'prop-types';
 
 const CharacterDetails = ({ character }) => {
   const {
@@ -91,6 +92,17 @@ const CharacterDetails = ({ character }) => {
       </Card>
     </div>
   );
+};
+CharacterDetails.propTypes = {
+  character: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    imageUrl: PropTypes.string.isRequired,
+    universe: PropTypes.string.isRequired,
+    stats: PropTypes.object.isRequired,
+    totalFights: PropTypes.number.isRequired,
+    wins: PropTypes.number.isRequired,
+    losses: PropTypes.number.isRequired
+  }).isRequired
 };
 
 export default CharacterDetails;

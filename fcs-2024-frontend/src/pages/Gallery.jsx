@@ -1,6 +1,6 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import './GalleryPage.css';
+import PropTypes from 'prop-types';
+import '../styles/GalleryPage.css';
 
 const GalleryPage = ({ characters }) => {
   return (
@@ -28,5 +28,15 @@ const GalleryPage = ({ characters }) => {
     </div>
   );
 };
+GalleryPage.propTypes = {
+  characters: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      imageUrl: PropTypes.string.isRequired
+    })
+  ).isRequired
+};
+
 
 export default GalleryPage;

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import Header from './Header'; // Import the Header component we created earlier
-import Footer from './Footer'; // Import the Footer component we created earlier
+import Header from '../components/Header'; // Import the Header component we created earlier
+import Footer from '../components/Footer'; // Import the Footer component we created earlier
 import { Helmet } from 'react-helmet-async';
 
 // You might want to replace this with an actual image or use a placeholder

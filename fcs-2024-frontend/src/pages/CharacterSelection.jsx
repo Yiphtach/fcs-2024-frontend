@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Swords } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 /**
  * @typedef {Object} Character
@@ -26,7 +27,6 @@ const CharacterSelection = ({ characters, universe }) => {
   const [opponentCharacter, setOpponentCharacter] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
 
   const filteredCharacters = characters.filter(char => 
     char.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -85,6 +85,25 @@ const CharacterSelection = ({ characters, universe }) => {
     </motion.div>
   );
 
+  const CharacterCardPropTypes = {
+      character: PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        imageUrl: PropTypes.string.isRequired,
+        stats: PropTypes.shape({
+          strength: PropTypes.number.isRequired,
+          speed: PropTypes.number.isRequired,
+          intelligence: PropTypes.number.isRequired,
+          durability: PropTypes.number.isRequired
+        }).isRequired,
+        universe: PropTypes.string.isRequired
+      }).isRequired,
+      isSelected: PropTypes.bool.isRequired,
+      onSelect: PropTypes.func.isRequired,
+      key: PropTypes.string
+  };
+  CharacterCard.propTypes = CharacterCardPropTypes;
+
   return (
     <motion.main
       initial={{ opacity: 0 }}
@@ -126,8 +145,10 @@ const CharacterSelection = ({ characters, universe }) => {
               <AnimatePresence>
                 {filteredCharacters.map((character) => (
                   <CharacterCard
+                    // eslint-disable-next-line react/prop-types
                     key={character._id}
                     character={character}
+                    // eslint-disable-next-line react/prop-types
                     isSelected={selectedCharacter?._id === character._id}
                     onSelect={() => handleCharacterSelect(character)}
                   />
@@ -145,8 +166,10 @@ const CharacterSelection = ({ characters, universe }) => {
                   .filter(char => char._id !== selectedCharacter?._id)
                   .map((character) => (
                     <CharacterCard
+                      // eslint-disable-next-line react/prop-types
                       key={character._id}
                       character={character}
+                      // eslint-disable-next-line react/prop-types
                       isSelected={opponentCharacter?._id === character._id}
                       onSelect={() => handleOpponentSelect(character)}
                     />
@@ -178,5 +201,21 @@ const CharacterSelection = ({ characters, universe }) => {
     </motion.main>
   );
 };
+CharacterSelection.propTypes = {
+  characters: PropTypes.arrayOf(PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    imageUrl: PropTypes.string.isRequired,
+    universe: PropTypes.string.isRequired,
+    stats: PropTypes.shape({
+      strength: PropTypes.number.isRequired,
+      speed: PropTypes.number.isRequired,
+      intelligence: PropTypes.number.isRequired,
+      durability: PropTypes.number.isRequired
+    }).isRequired
+  })).isRequired,
+  universe: PropTypes.string.isRequired
+};
+
 
 export default CharacterSelection;
