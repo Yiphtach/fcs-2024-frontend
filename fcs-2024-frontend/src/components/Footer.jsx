@@ -1,9 +1,8 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-white py-5 text-center text-base">
+    <footer className="bg-gray-800 text-white py-5 text-center text-base" role="contentinfo">
       <div className="max-w-[1200px] mx-auto px-5">
         <p>&copy; {new Date().getFullYear()} Fight Simulation App. All rights reserved.</p>
         

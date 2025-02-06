@@ -1,7 +1,4 @@
-import React from 'react';
-
-// Optionally, import a dedicated CSS file or create a styles object for inline styling
-// import './CharacterList.css';
+import PropTypes from 'prop-types';
 
 function CharacterList({
   characters = [],
@@ -12,9 +9,8 @@ function CharacterList({
   onPageChange = () => {},
   onCreateNew = () => {}
 }) {
-  
   const handleDelete = (characterId) => {
-    // Typically you'd confirm deletion via a modal or confirm dialog
+    // Confirm deletion via a modal or confirm dialog
     const confirmed = window.confirm('Are you sure you want to delete this character?');
     if (confirmed) {
       onDelete(characterId);
@@ -25,15 +21,17 @@ function CharacterList({
     const pages = [];
     for (let i = 1; i <= totalPages; i++) {
       pages.push(
-        <a
+        <button
           key={i}
-          href="#!"
-          className={i === currentPage ? 'active' : ''}
           onClick={() => onPageChange(i)}
-          style={styles.paginationLink}
+          style={{
+            ...styles.paginationLink,
+            ...(i === currentPage ? styles.activePaginationLink : {})
+          }}
+          aria-label={`Go to page ${i}`}
         >
           {i}
-        </a>
+        </button>
       );
     }
     return pages;
@@ -80,18 +78,19 @@ function CharacterList({
               <td>{character.winRatio}</td>
               <td>{character.lossRatio}</td>
               <td>
-                {/* EDIT BUTTON */}
+                {/* Edit Button */}
                 <button
                   onClick={() => onEdit(character._id)}
                   style={styles.actionButton}
+                  aria-label={`Edit ${character.name}`}
                 >
                   Edit
                 </button>
-
-                {/* DELETE BUTTON */}
+                {/* Delete Button */}
                 <button
                   onClick={() => handleDelete(character._id)}
                   style={styles.actionButton}
+                  aria-label={`Delete ${character.name}`}
                 >
                   Delete
                 </button>
@@ -102,58 +101,52 @@ function CharacterList({
       </table>
 
       {/* Pagination Controls */}
-      <div style={styles.pagination}>
-        {/* PREVIOUS BUTTON */}
-        {currentPage > 1 ? (
-          <a
-            href="#!"
-            onClick={() => onPageChange(currentPage - 1)}
-            style={{ ...styles.paginationLink, ...styles.navButton }}
-          >
-            Previous
-          </a>
-        ) : (
-          <a
-            href="#!"
-            style={{ ...styles.paginationLink, ...styles.disabled }}
-            onClick={(e) => e.preventDefault()}
-          >
-            Previous
-          </a>
-        )}
+      <div style={styles.pagination} role="navigation" aria-label="Pagination">
+        {/* Previous Button */}
+        <button
+          onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
+          style={{
+            ...styles.paginationLink,
+            ...styles.navButton,
+            ...(currentPage === 1 ? styles.disabled : {})
+          }}
+          disabled={currentPage === 1}
+          aria-label="Previous page"
+        >
+          Previous
+        </button>
 
-        {/* PAGE NUMBERS */}
+        {/* Page Numbers */}
         {renderPagination()}
 
-        {/* NEXT BUTTON */}
-        {currentPage < totalPages ? (
-          <a
-            href="#!"
-            onClick={() => onPageChange(currentPage + 1)}
-            style={{ ...styles.paginationLink, ...styles.navButton }}
-          >
-            Next
-          </a>
-        ) : (
-          <a
-            href="#!"
-            style={{ ...styles.paginationLink, ...styles.disabled }}
-            onClick={(e) => e.preventDefault()}
-          >
-            Next
-          </a>
-        )}
+        {/* Next Button */}
+        <button
+          onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
+          style={{
+            ...styles.paginationLink,
+            ...styles.navButton,
+            ...(currentPage === totalPages ? styles.disabled : {})
+          }}
+          disabled={currentPage === totalPages}
+          aria-label="Next page"
+        >
+          Next
+        </button>
       </div>
 
       {/* Create New Character Button */}
-      <button onClick={onCreateNew} style={styles.createButton}>
+      <button
+        onClick={onCreateNew}
+        style={styles.createButton}
+        aria-label="Create new character"
+      >
         Create New Character
       </button>
     </div>
   );
 }
 
-// Inline Styles (Optional). Typically, you would use a separate CSS file.
+// Inline Styles (For demonstration; typically, a separate CSS file is recommended)
 const styles = {
   container: {
     fontFamily: 'Arial, sans-serif',
@@ -184,9 +177,14 @@ const styles = {
     borderRadius: '5px',
     transition: 'background-color 0.3s ease',
     cursor: 'pointer',
+    border: 'none',
+    outline: 'none',
+  },
+  activePaginationLink: {
+    backgroundColor: '#388E3C',
   },
   navButton: {
-    // Additional styling for prev/next
+    // Additional styling for navigation buttons (if needed)
   },
   disabled: {
     pointerEvents: 'none',
@@ -201,6 +199,7 @@ const styles = {
     color: 'white',
     borderRadius: '4px',
     cursor: 'pointer',
+    transition: 'background-color 0.3s ease',
   },
   createButton: {
     padding: '10px 20px',
@@ -212,6 +211,35 @@ const styles = {
     cursor: 'pointer',
     marginTop: '10px',
   },
+};
+
+CharacterList.propTypes = {
+  characters: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      universe: PropTypes.string.isRequired,
+      stats: PropTypes.shape({
+        strength: PropTypes.number,
+        speed: PropTypes.number,
+        durability: PropTypes.number,
+        power: PropTypes.number,
+        combat: PropTypes.number,
+        intelligence: PropTypes.number,
+      }),
+      wins: PropTypes.number,
+      losses: PropTypes.number,
+      totalFights: PropTypes.number,
+      winRatio: PropTypes.number,
+      lossRatio: PropTypes.number,
+    })
+  ),
+  currentPage: PropTypes.number,
+  totalPages: PropTypes.number,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+  onPageChange: PropTypes.func,
+  onCreateNew: PropTypes.func,
 };
 
 export default CharacterList;
