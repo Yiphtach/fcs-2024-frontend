@@ -1,17 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './Components/Header';
-import Footer from './Components/Footer';
-import HomePage from './Pages/HomePage';
-import Characters from './Pages/Characters';
-import About from './Pages/About';
-import CharacterDetails from './Pages/CharacterDetails';
-import FightResults from './Pages/FightResults';
-import FightSetup from './Pages/FightSetup';
-import Gallery from './Pages/Gallery';
-import Leaderboards from './Pages/Leaderboards';
-
-// Optionally, import global CSS if not done in the entry point
-// import '../Styles/Styles.css';
+import Header from '/components/Header.jsx';
+import Footer from './components/Footer.jsx';
+import HomePage from './pages/HomePage.jsx';
+import Characters from './pages/Characters.jsx';
+import About from './pages/About.jsx';
+import CharacterDetails from './pages/CharacterDetails.jsx';
+import FightResults from './pages/FightResults.jsx';
+import FightSetup from './pages/FightSetup.jsx';
+import Gallery from './pages/Gallery.jsx';
+import Leaderboards from './pages/Leaderboards.jsx';
+import './styles/styles.css';
 
 const App = () => {
   return (
