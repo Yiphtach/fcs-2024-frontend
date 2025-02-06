@@ -6,9 +6,9 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
 
 // Import scenes for different locations
-import { createNewYorkCityScene } from './scenes/newYorkCity';
-import { createMetropolisScene } from './scenes/metropolis';
-import { createAsgardScene } from './scenes/asgard';
+import { createNewYorkCityScene } from '../../public/animations/scenes/newYorkCity';
+import { createMetropolisScene } from '../../public/animations/scenes/metropolis';
+import { createAsgardScene } from '../../public/animations/scenes/asgard';
 
 const FightAnimation = ({ winner, loser, moveType, location }) => {
   const mountRef = useRef(null);

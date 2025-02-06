@@ -1,65 +1,55 @@
-<footer>
-    <div class="container">
-        <p>&copy; <%= new Date().getFullYear() %> Fight Simulation App. All rights reserved.</p>
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+const Footer = () => {
+  return (
+    <footer className="bg-gray-800 text-white py-5 text-center text-base">
+      <div className="max-w-[1200px] mx-auto px-5">
+        <p>&copy; {new Date().getFullYear()} Fight Simulation App. All rights reserved.</p>
         
-        <nav role="navigation" aria-label="Footer Navigation">
-            <ul class="footer-links">
-                <li><a href="/" aria-label="Go to Home">Home</a></li>
-                <li><a href="/fights" aria-label="Simulate a Fight">Simulate a Fight</a></li>
-                <li><a href="/leaderboards" aria-label="View Leaderboard">Leaderboard</a></li>
-                <li><a href="/about" aria-label="Learn More About the App">About</a></li>
-            </ul>
+        <nav role="navigation" aria-label="Footer Navigation" className="mt-4">
+          <ul className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
+            <li>
+              <Link 
+                to="/" 
+                aria-label="Go to Home" 
+                className="text-white hover:text-green-500 transition-colors duration-300"
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/fights" 
+                aria-label="Simulate a Fight" 
+                className="text-white hover:text-green-500 transition-colors duration-300"
+              >
+                Simulate a Fight
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/leaderboards" 
+                aria-label="View Leaderboard" 
+                className="text-white hover:text-green-500 transition-colors duration-300"
+              >
+                Leaderboard
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/about" 
+                aria-label="Learn More About the App" 
+                className="text-white hover:text-green-500 transition-colors duration-300"
+              >
+                About
+              </Link>
+            </li>
+          </ul>
         </nav>
-    </div>
-</footer>
+      </div>
+    </footer>
+  );
+};
 
-<style>
-    footer {
-        background-color: #333;
-        color: white;
-        padding: 20px 0;
-        text-align: center;
-        font-size: 16px;
-    }
-
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
-    }
-
-    .footer-links {
-        list-style: none;
-        padding: 0;
-        margin: 10px 0;
-    }
-
-    .footer-links li {
-        display: inline;
-        margin-right: 15px;
-    }
-
-    .footer-links li a {
-        color: white;
-        text-decoration: none;
-        transition: color 0.3s ease;
-    }
-
-    .footer-links li a:hover {
-        color: #4CAF50;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .footer-links li {
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .footer-links {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-    }
-</style>
+export default Footer;

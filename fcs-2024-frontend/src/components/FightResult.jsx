@@ -1,136 +1,99 @@
-<%- include('partials/header') %>  <!-- Include the header partial -->
+import React, { useState, useEffect } from 'react';
+import { Button, Progress } from '@/components/ui/';
 
-<main>
-    <!-- Fight Result Section -->
-    <section class="fight-result">
-        <h1>Fight Result</h1>
-        <p><strong><%= char1.name %></strong> vs. <strong><%= char2.name %></strong></p>
+const FightResult = ({ char1, char2, fightResult }) => {
+  const [char1Health, setChar1Health] = useState(fightResult.initialChar1Health);
+  const [char2Health, setChar2Health] = useState(fightResult.initialChar2Health);
+  const [fightLog, setFightLog] = useState([]);
 
-        <!-- Health Bars for Both Characters -->
-        <div class="health-bars">
-            <div>
-                <strong><%= char1.name %></strong>: 
-                <progress value="<%= char1Health %>" max="100" id="char1-health"></progress>
-                <span id="char1-health-text"><%= char1Health %></span>/100
-            </div>
-            <div>
-                <strong><%= char2.name %></strong>: 
-                <progress value="<%= char2Health %>" max="100" id="char2-health"></progress>
-                <span id="char2-health-text"><%= char2Health %></span>/100
-            </div>
-        </div>
+  // Helper function to extract damage from log
+  const extractDamage = (log) => {
+    const damageMatch = log.match(/causing (\d+) damage/);
+    return damageMatch ? parseInt(damageMatch[1], 10) : 0;
+  };
 
-        <!-- Fight Log: Round-by-Round Breakdown -->
-        <ul id="fight-log">
-            <% fightResult.log.forEach((log) => { %>
-                <li><%= log %></li>
-            <% }) %>
-        </ul>
+  // Simulate fight log progression
+  useEffect(() => {
+    const logs = [...fightResult.log];
+    const updatedLog = [];
 
-        <button onclick="location.href='/fights'" class="btn-fight-again">Simulate Another Fight</button>
-    </section>
-</main>
+    const logInterval = setInterval(() => {
+      if (logs.length > 0) {
+        const currentLog = logs.shift();
+        updatedLog.push(currentLog);
+        setFightLog([...updatedLog]);
 
-<%- include('partials/footer') %>  <!-- Include the footer partial -->
-
-<!-- JavaScript for Real-Time Health Bar and Fight Log Updates -->
-<script>
-    const fightLogElement = document.getElementById('fight-log');
-    let char1Health = <%= char1Health %>;
-    let char2Health = <%= char2Health %>;
-
-    // Simulate health bar updates
-    fightResult.log.forEach((log, index) => {
-        setTimeout(() => {
-            fightLogElement.children[index].scrollIntoView({ behavior: 'smooth' });
-
-            // Dynamically update health bars based on the fight log
-            if (log.includes('<%= char1.name %> attacks')) {
-                char2Health -= extractDamage(log);
-                document.getElementById('char2-health').value = char2Health;
-                document.getElementById('char2-health-text').innerText = char2Health;
-            } else if (log.includes('<%= char2.name %> attacks')) {
-                char1Health -= extractDamage(log);
-                document.getElementById('char1-health').value = char1Health;
-                document.getElementById('char1-health-text').innerText = char1Health;
-            }
-        }, 1000 * index);
-    });
-
-    // Helper function to extract damage from the fight log
-    function extractDamage(log) {
-        const damageMatch = log.match(/causing (\d+) damage/);
-        return damageMatch ? parseInt(damageMatch[1], 10) : 0;
-    }
-</script>
-
-<!-- CSS Styles -->
-<style>
-    main {
-        padding: 20px;
-    }
-
-    /* Fight Result Section */
-    .fight-result {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    .fight-result h1 {
-        font-size: 36px;
-        margin-bottom: 20px;
-    }
-    .fight-result p {
-        font-size: 18px;
-        margin-bottom: 30px;
-    }
-
-    /* Health Bars */
-    .health-bars {
-        display: flex;
-        justify-content: space-around;
-        margin-bottom: 20px;
-    }
-    progress {
-        width: 100px;
-        height: 20px;
-    }
-
-    /* Fight Log */
-    #fight-log {
-        list-style-type: none;
-        padding: 0;
-        margin-bottom: 30px;
-    }
-    #fight-log li {
-        background-color: #f4f4f4;
-        padding: 10px;
-        margin-bottom: 5px;
-        border-radius: 5px;
-    }
-
-    /* Button */
-    .btn-fight-again {
-        padding: 15px 25px;
-        background-color: #4CAF50;
-        color: white;
-        text-decoration: none;
-        font-size: 18px;
-        border-radius: 5px;
-        cursor: pointer;
-        border: none;
-    }
-    .btn-fight-again:hover {
-        background-color: #45a049;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .health-bars {
-            flex-direction: column;
-            align-items: center;
+        // Update health bars
+        if (currentLog.includes(`${char1.name} attacks`)) {
+          setChar2Health(prev => Math.max(0, prev - extractDamage(currentLog)));
+        } else if (currentLog.includes(`${char2.name} attacks`)) {
+          setChar1Health(prev => Math.max(0, prev - extractDamage(currentLog)));
         }
-        progress {
-            width: 80%;
-        }
-    }
-</style>
+      } else {
+        clearInterval(logInterval);
+      }
+    }, 1000);
+
+    return () => clearInterval(logInterval);
+  }, [char1.name, char2.name, fightResult.log]);
+
+  const handleFightAgain = () => {
+    window.location.href = '/fights';
+  };
+
+  return (
+    <div className="fight-result-container">
+      <main className="p-5">
+        <section className="text-center mb-8">
+          <h1 className="text-4xl mb-5">Fight Result</h1>
+          <p className="text-xl mb-8">
+            <strong>{char1.name}</strong> vs. <strong>{char2.name}</strong>
+          </p>
+
+          {/* Health Bars */}
+          <div className="flex justify-around mb-5">
+            <div className="text-center">
+              <strong>{char1.name}</strong>
+              <Progress 
+                value={char1Health} 
+                max={100} 
+                className="w-[100px] h-5 mx-auto" 
+              />
+              <span>{char1Health}/100</span>
+            </div>
+            <div className="text-center">
+              <strong>{char2.name}</strong>
+              <Progress 
+                value={char2Health} 
+                max={100} 
+                className="w-[100px] h-5 mx-auto" 
+              />
+              <span>{char2Health}/100</span>
+            </div>
+          </div>
+
+          {/* Fight Log */}
+          <ul className="list-none p-0 mb-8">
+            {fightLog.map((log, index) => (
+              <li 
+                key={index} 
+                className="bg-gray-100 p-3 mb-2 rounded-md"
+              >
+                {log}
+              </li>
+            ))}
+          </ul>
+
+          <Button 
+            onClick={handleFightAgain} 
+            className="bg-green-500 hover:bg-green-600 text-white"
+          >
+            Simulate Another Fight
+          </Button>
+        </section>
+      </main>
+    </div>
+  );
+};
+
+export default FightResult;

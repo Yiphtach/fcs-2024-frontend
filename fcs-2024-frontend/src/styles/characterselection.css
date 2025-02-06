@@ -1,0 +1,77 @@
+.character-selection-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .character-selection {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .character-option {
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .character-option:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .start-fight-button {
+    padding: 15px 25px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+  }
+  
+  .start-fight-button:hover {
+    background-color: #45a049;
+  }
+  
+  .start-fight-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  select {
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    width: 100%;
+    border-radius: 5px;
+  }
+  
+  .back-button {
+    padding: 10px 20px;
+    background-color: #555;
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  
+  .back-button:hover {
+    background-color: #333;
+  }
+  
+  .selected-character {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .character-image {
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }

@@ -1,0 +1,48 @@
+/* Animation keyframes */
+@keyframes punch-right {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(100px); }
+    100% { transform: translateX(0); }
+  }
+  
+  @keyframes punch-left {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-100px); }
+    100% { transform: translateX(0); }
+  }
+  
+  @keyframes kick-right {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-50px) translateX(50px); }
+    100% { transform: translateY(0); }
+  }
+  
+  @keyframes kick-left {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-50px) translateX(-50px); }
+    100% { transform: translateY(0); }
+  }
+  
+  /* Animation classes */
+  .punch-right {
+    animation: punch-right 0.5s ease-in-out;
+  }
+  
+  .punch-left {
+    animation: punch-left 0.5s ease-in-out;
+  }
+  
+  .kick-right {
+    animation: kick-right 0.5s ease-in-out;
+  }
+  
+  .kick-left {
+    animation: kick-left 0.5s ease-in-out;
+  }
+  
+  /* Character container */
+  .character-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }

@@ -1,192 +1,206 @@
-<%- include('partials/header') %> <!-- Include the header partial -->
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-<main>
-    <h1><%= character ? 'Edit' : 'Create' %> Character</h1>
+const CharacterForm = ({ character, onSubmit }) => {
+  const [formData, setFormData] = useState({
+    name: character?.name || '',
+    universe: character?.universe || '',
+    stats: {
+      strength: character?.stats?.strength || '',
+      speed: character?.stats?.speed || '',
+      durability: character?.stats?.durability || '',
+      power: character?.stats?.power || '',
+      combat: character?.stats?.combat || '',
+      intelligence: character?.stats?.intelligence || ''
+    },
+    abilities: character?.abilities || [{ name: '', powerLevel: '' }]
+  });
 
-    <!-- Character Form -->
-    <form action="<%= character ? `/characters/${character._id}?_method=PUT` : '/characters' %>" method="POST" class="character-form">
-        <!-- Character Name -->
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" value="<%= character ? character.name : '' %>" required placeholder="Enter character name">
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name.startsWith('stats.')) {
+      const statName = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        stats: {
+          ...prev.stats,
+          [statName]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
 
-        <!-- Universe -->
-        <label for="universe">Universe</label>
-        <select id="universe" name="universe" required>
-            <option value="">Select Universe</option>
-            <option value="Marvel" <%= character && character.universe === 'Marvel' ? 'selected' : '' %>>Marvel</option>
-            <option value="DC" <%= character && character.universe === 'DC' ? 'selected' : '' %>>DC</option>
-            <option value="Other" <%= character && character.universe === 'Other' ? 'selected' : '' %>>Other</option>
-        </select>
+  const handleAbilityChange = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      abilities: prev.abilities.map((ability, i) =>
+        i === index ? { ...ability, [field]: value } : ability
+      )
+    }));
+  };
 
-        <!-- Stats -->
-        <fieldset>
-            <legend>Stats (0-100)</legend>
-            <label for="strength">Strength</label>
-            <input type="number" id="strength" name="stats[strength]" value="<%= character ? character.stats.strength : '' %>" min="0" max="100" required placeholder="Strength">
+  const addAbility = () => {
+    setFormData(prev => ({
+      ...prev,
+      abilities: [...prev.abilities, { name: '', powerLevel: '' }]
+    }));
+  };
 
-            <label for="speed">Speed</label>
-            <input type="number" id="speed" name="stats[speed]" value="<%= character ? character.stats.speed : '' %>" min="0" max="100" required placeholder="Speed">
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
 
-            <label for="durability">Durability</label>
-            <input type="number" id="durability" name="stats[durability]" value="<%= character ? character.stats.durability : '' %>" min="0" max="100" required placeholder="Durability">
+  return (
+    <div className="container mx-auto p-4 max-w-2xl">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">
+            {character ? 'Edit' : 'Create'} Character
+          </CardTitle>
+        </CardHeader>
 
-            <label for="power">Power</label>
-            <input type="number" id="power" name="stats[power]" value="<%= character ? character.stats.power : '' %>" min="0" max="100" required placeholder="Power">
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Basic Information */}
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Enter character name"
+                />
+              </div>
 
-            <label for="combat">Combat</label>
-            <input type="number" id="combat" name="stats[combat]" value="<%= character ? character.stats.combat : '' %>" min="0" max="100" required placeholder="Combat">
-
-            <label for="intelligence">Intelligence</label>
-            <input type="number" id="intelligence" name="stats[intelligence]" value="<%= character ? character.stats.intelligence : '' %>" min="0" max="100" required placeholder="Intelligence">
-        </fieldset>
-
-        <!-- Abilities (Editable, with Default Abilities) -->
-        <fieldset>
-            <legend>Abilities</legend>
-            <div id="abilities">
-                <% if (character && character.abilities.length > 0) { %>
-                    <% character.abilities.forEach((ability, index) => { %>
-                        <label for="ability-<%= index %>">Ability <%= index + 1 %></label>
-                        <input type="text" id="ability-<%= index %>" name="abilities[<%= index %>][name]" value="<%= ability.name %>" placeholder="Enter ability name">
-                        <input type="number" name="abilities[<%= index %>][powerLevel]" value="<%= ability.powerLevel %>" min="0" max="100" placeholder="Power Level">
-                    <% }) %>
-                <% } else { %>
-                    <label for="ability-0">Ability 1</label>
-                    <input type="text" id="ability-0" name="abilities[0][name]" placeholder="Enter ability name">
-                    <input type="number" name="abilities[0][powerLevel]" min="0" max="100" placeholder="Power Level">
-                <% } %>
+              <div>
+                <label htmlFor="universe" className="block text-sm font-medium text-gray-700">
+                  Universe
+                </label>
+                <select
+                  id="universe"
+                  name="universe"
+                  value={formData.universe}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="">Select Universe</option>
+                  <option value="Marvel">Marvel</option>
+                  <option value="DC">DC</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
             </div>
-            <button type="button" onclick="addAbility()">Add Ability</button>
-        </fieldset>
 
-        <!-- Submit Button -->
-        <button type="submit" class="btn-submit"><%= character ? 'Update' : 'Create' %> Character</button>
-    </form>
-</main>
+            {/* Stats Section */}
+            <fieldset className="border rounded-md p-4">
+              <legend className="text-lg font-medium text-gray-700 px-2">
+                Stats (0-100)
+              </legend>
+              <div className="grid grid-cols-2 gap-4">
+                {Object.entries(formData.stats).map(([stat, value]) => (
+                  <div key={stat}>
+                    <label
+                      htmlFor={stat}
+                      className="block text-sm font-medium text-gray-700 capitalize"
+                    >
+                      {stat}
+                    </label>
+                    <input
+                      type="number"
+                      id={stat}
+                      name={`stats.${stat}`}
+                      value={value}
+                      onChange={handleChange}
+                      min="0"
+                      max="100"
+                      required
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    />
+                  </div>
+                ))}
+              </div>
+            </fieldset>
 
-<%- include('partials/footer') %> <!-- Include the footer partial -->
+            {/* Abilities Section */}
+            <fieldset className="border rounded-md p-4">
+              <legend className="text-lg font-medium text-gray-700 px-2">
+                Abilities
+              </legend>
+              <div className="space-y-4">
+                {formData.abilities.map((ability, index) => (
+                  <div key={index} className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label
+                        htmlFor={`ability-${index}`}
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Ability {index + 1}
+                      </label>
+                      <input
+                        type="text"
+                        id={`ability-${index}`}
+                        value={ability.name}
+                        onChange={(e) => handleAbilityChange(index, 'name', e.target.value)}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Enter ability name"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor={`power-${index}`}
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Power Level
+                      </label>
+                      <input
+                        type="number"
+                        id={`power-${index}`}
+                        value={ability.powerLevel}
+                        onChange={(e) => handleAbilityChange(index, 'powerLevel', e.target.value)}
+                        min="0"
+                        max="100"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Power Level"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addAbility}
+                  className="w-full mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                >
+                  Add Ability
+                </button>
+              </div>
+            </fieldset>
 
-<!-- JavaScript to Dynamically Add Abilities -->
-<script>
-    function addAbility() {
-        const abilitiesDiv = document.getElementById('abilities');
-        const newIndex = abilitiesDiv.children.length / 2;  // Each ability has two inputs (name and powerLevel)
-        const label = document.createElement('label');
-        label.textContent = `Ability ${newIndex + 1}`;
-        label.setAttribute('for', `ability-${newIndex}`);
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+            >
+              {character ? 'Update' : 'Create'} Character
+            </button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
-        const inputName = document.createElement('input');
-        inputName.setAttribute('type', 'text');
-        inputName.setAttribute('id', `ability-${newIndex}`);
-        inputName.setAttribute('name', `abilities[${newIndex}][name]`);
-        inputName.setAttribute('placeholder', 'Enter ability name');
-
-        const inputPowerLevel = document.createElement('input');
-        inputPowerLevel.setAttribute('type', 'number');
-        inputPowerLevel.setAttribute('name', `abilities[${newIndex}][powerLevel]`);
-        inputPowerLevel.setAttribute('min', '0');
-        inputPowerLevel.setAttribute('max', '100');
-        inputPowerLevel.setAttribute('placeholder', 'Power Level');
-
-        abilitiesDiv.appendChild(label);
-        abilitiesDiv.appendChild(inputName);
-        abilitiesDiv.appendChild(inputPowerLevel);
-    }
-</script>
-
-<!-- CSS Styles -->
-<style>
-    main {
-        padding: 20px;
-        text-align: center;
-    }
-
-    h1 {
-        font-size: 36px;
-        margin-bottom: 20px;
-        color: #333;
-    }
-
-    .character-form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .character-form label {
-        margin-top: 10px;
-        font-size: 18px;
-        color: #333;
-    }
-
-    .character-form input,
-    .character-form select {
-        padding: 10px;
-        font-size: 16px;
-        width: 100%;
-        margin-top: 5px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-
-    .character-form input[type="number"] {
-        max-width: 120px;
-    }
-
-    .btn-submit {
-        margin-top: 20px;
-        padding: 15px 30px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 18px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-submit:hover {
-        background-color: #45a049;
-    }
-
-    fieldset {
-        margin-top: 20px;
-        border: 1px solid #ddd;
-        padding: 10px;
-        border-radius: 5px;
-    }
-
-    legend {
-        padding: 0 10px;
-        font-weight: bold;
-        color: #333;
-    }
-
-    button[type="button"] {
-        margin-top: 10px;
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-
-    button[type="button"]:hover {
-        background-color: #0056b3;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .character-form {
-            width: 90%;
-        }
-
-        .btn-submit {
-            width: 100%;
-        }
-    }
-</style>
+export default CharacterForm;

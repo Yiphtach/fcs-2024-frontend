@@ -3,27 +3,27 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, Swords } from 'lucide-react';
 
-interface Character {
-  _id: string;
-  name: string;
-  imageUrl: string;
-  universe: string;
-  stats: {
-    strength: number;
-    speed: number;
-    intelligence: number;
-    durability: number;
-  };
-}
+/**
+ * @typedef {Object} Character
+ * @property {string} _id
+ * @property {string} name
+ * @property {string} imageUrl
+ * @property {string} universe
+ * @property {Object} stats
+ * @property {number} stats.strength
+ * @property {number} stats.speed
+ * @property {number} stats.intelligence
+ * @property {number} stats.durability
+ */
 
-interface CharacterSelectionProps {
-  characters: Character[];
-  universe: string;
-}
-
-const CharacterSelection: React.FC<CharacterSelectionProps> = ({ characters, universe }) => {
-  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
-  const [opponentCharacter, setOpponentCharacter] = useState<Character | null>(null);
+/**
+ * @param {Object} props
+ * @param {Character[]} props.characters
+ * @param {string} props.universe
+ */
+const CharacterSelection = ({ characters, universe }) => {
+  const [selectedCharacter, setSelectedCharacter] = useState(null);
+  const [opponentCharacter, setOpponentCharacter] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,7 +32,7 @@ const CharacterSelection: React.FC<CharacterSelectionProps> = ({ characters, uni
     char.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCharacterSelect = (character: Character) => {
+  const handleCharacterSelect = (character) => {
     setSelectedCharacter(character);
     // Reset opponent if they selected the same character
     if (opponentCharacter?._id === character._id) {
@@ -40,7 +40,7 @@ const CharacterSelection: React.FC<CharacterSelectionProps> = ({ characters, uni
     }
   };
 
-  const handleOpponentSelect = (character: Character) => {
+  const handleOpponentSelect = (character) => {
     setOpponentCharacter(character);
   };
 
@@ -55,11 +55,7 @@ const CharacterSelection: React.FC<CharacterSelectionProps> = ({ characters, uni
     }
   };
 
-  const CharacterCard: React.FC<{ 
-    character: Character; 
-    isSelected: boolean;
-    onSelect: () => void;
-  }> = ({ character, isSelected, onSelect }) => (
+  const CharacterCard = ({ character, isSelected, onSelect }) => (
     <motion.div
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}

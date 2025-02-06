@@ -1,84 +1,59 @@
-<%- include('partials/header') %>  <!-- Include the header partial -->
+import { Link } from 'react-router-dom';
+import Header from './Header'; // Import the Header component we created earlier
+import Footer from './Footer'; // Import the Footer component we created earlier
+import { Helmet } from 'react-helmet-async';
 
-<main>
-    <!-- About Section -->
-    <section class="about">
-        <h1>About This App</h1>
-        <p>The Fight Simulation App allows you to experience exciting battles between your favorite comic book characters from various universes. 
-        Using their unique stats and abilities, you can pit them against each other and see who comes out on top. Every fight is simulated in real-time,
-        and detailed statistics are generated after each match.</p>
+// You might want to replace this with an actual image or use a placeholder
+const FightBannerImage = '/images/fight-banner.jpg';
 
-        <p>Our platform provides a leaderboard to track the performance of different characters, so you can see who reigns supreme based on their 
-        win/loss record. Dive into the world of comic battles and analyze every move, stat, and ability to understand how each victory or defeat 
-        was achieved.</p>
+const AboutPage = () => {
+  return (
+    <>
+      <Helmet>
+        <title>About - Fight Simulation App</title>
+      </Helmet>
+      
+      <Header title="Fight Simulation App" />
+      
+      <main className="p-5">
+        <section className="about max-w-[800px] mx-auto text-center py-10 px-5">
+          <h1 className="text-3xl md:text-4xl mb-5 text-gray-800 font-bold">About This App</h1>
+          
+          <p className="text-base md:text-lg mb-7 text-gray-600 leading-relaxed">
+            The Fight Simulation App allows you to experience exciting battles between your favorite comic book characters 
+            from various universes. Using their unique stats and abilities, you can pit them against each other and see 
+            who comes out on top. Every fight is simulated in real-time, and detailed statistics are generated after each match.
+          </p>
 
-        <!-- Add Visual Appeal with an Image or Icon -->
-        <img src="/images/fight-banner.jpg" alt="Comic Battle" class="about-image">
+          <p className="text-base md:text-lg mb-7 text-gray-600 leading-relaxed">
+            Our platform provides a leaderboard to track the performance of different characters, so you can see who reigns 
+            supreme based on their win/loss record. Dive into the world of comic battles and analyze every move, stat, and 
+            ability to understand how each victory or defeat was achieved.
+          </p>
 
-        <a href="/" class="btn-back-home">Back to Home</a>
-    </section>
-</main>
+          {/* Image with fallback for cases where image might not load */}
+          <img 
+            src={FightBannerImage} 
+            alt="Comic Battle" 
+            className="w-full h-auto mb-8 rounded-lg shadow-md object-cover"
+            onError={(e) => {
+              e.target.src = '/path/to/fallback/image.jpg'; // Add a fallback image path
+            }}
+          />
 
-<%- include('partials/footer') %>  <!-- Include the footer partial -->
+          <Link 
+            to="/" 
+            className="inline-block px-6 py-3 bg-green-500 text-white text-lg rounded-md 
+                       transition-all duration-300 hover:bg-green-600 hover:shadow-lg"
+          >
+            Back to Home
+          </Link>
+        </section>
+      </main>
+      
+      <Footer />
+    </>
+  );
+};
 
-<!-- CSS Styles -->
-<style>
-    main {
-        padding: 20px;
-    }
-
-    /* About Section */
-    .about {
-        padding: 40px;
-        text-align: center;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-    .about h1 {
-        font-size: 36px;
-        margin-bottom: 20px;
-        color: #333;
-    }
-    .about p {
-        font-size: 18px;
-        margin-bottom: 30px;
-        line-height: 1.6;
-        color: #555;
-    }
-    .about-image {
-        width: 100%;
-        height: auto;
-        margin-bottom: 30px;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Added subtle shadow for visual appeal */
-    }
-    .btn-back-home {
-        padding: 15px 25px;
-        background-color: #4CAF50;
-        color: white;
-        text-decoration: none;
-        font-size: 18px;
-        border-radius: 5px;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    }
-    .btn-back-home:hover {
-        background-color: #45a049;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Added shadow on hover for a more interactive feel */
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .about {
-            padding: 20px;
-        }
-        .about h1 {
-            font-size: 28px;
-        }
-        .about p {
-            font-size: 16px;
-        }
-        .about-image {
-            width: 100%;
-        }
-    }
-</style>
+export default AboutPage;
