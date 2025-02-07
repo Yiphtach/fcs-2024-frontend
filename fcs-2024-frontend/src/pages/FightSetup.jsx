@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 
-// Extracted Universe Card Component
+// Universe Card Component
 const UniverseCard = ({ universe, isSelected, onSelect }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -60,7 +60,7 @@ const UniverseCard = ({ universe, isSelected, onSelect }) => {
               <Users className="w-4 h-4" />
               {universe.characterCount} Characters
             </span>
-            <motion.button 
+            <motion.div 
               className="px-4 py-2 bg-green-500 text-white rounded-lg
                        hover:bg-green-600 transition-colors duration-300
                        flex items-center gap-2"
@@ -69,7 +69,7 @@ const UniverseCard = ({ universe, isSelected, onSelect }) => {
             >
               Select
               <ChevronRight className="w-4 h-4" />
-            </motion.button>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -89,7 +89,7 @@ UniverseCard.propTypes = {
   onSelect: PropTypes.func.isRequired
 };
 
-// Search Component
+// Universe Search Component
 const UniverseSearch = ({ onSearch }) => (
   <div className="relative mb-8">
     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -122,7 +122,20 @@ const FightSetup = () => {
       characterCount: 150,
       backgroundImage: '/images/dc-background.jpg'
     },
-    // ... rest of the universes
+    {
+      id: 'marvel',
+      name: 'Marvel',
+      description: 'Realm of Avengers and X-Men',
+      characterCount: 200,
+      backgroundImage: '/images/marvel-background.jpg'
+    },
+    {
+      id: 'anime',
+      name: 'Anime',
+      description: 'Epic fighters from various anime universes',
+      characterCount: 100,
+      backgroundImage: '/images/anime-background.jpg'
+    }
   ];
 
   // Simulate loading state
@@ -142,7 +155,7 @@ const FightSetup = () => {
       navigate(`/fights/select-character?universe=${encodeURIComponent(universeId)}`);
     }, 300);
   };
-
+  
   return (
     <motion.div 
       initial={{ opacity: 0 }}

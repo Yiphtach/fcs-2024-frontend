@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 
 const StatBar = ({ current, max, label, color = 'bg-red-500' }) => {
-    const percentage = (current / max) * 100;
+    const percentage = Math.min((current / max) * 100, 100);
 
     return (
         <div className="w-full space-y-1">
@@ -31,6 +31,10 @@ StatBar.propTypes = {
     max: PropTypes.number.isRequired,
     label: PropTypes.string.isRequired,
     color: PropTypes.string
+};
+
+StatBar.defaultProps = {
+    color: 'bg-red-500'
 };
 
 export default StatBar;
