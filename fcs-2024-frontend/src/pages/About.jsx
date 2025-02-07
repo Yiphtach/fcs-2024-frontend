@@ -34,7 +34,7 @@ const features = [
   }
 ];
 
-const AboutPage = () => {
+const About = () => {
   const [imageError, setImageError] = useState(false);
 
   return (
@@ -142,7 +142,7 @@ const AboutPage = () => {
                 Browse Characters
               </Link>
               <a
-                href="https://github.com/yourusername/fight-simulation-app"
+                href="https://github.com/Yiphtach/fcs-2024"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-8 py-4 bg-gray-700 text-white rounded-xl font-bold hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
@@ -158,4 +158,4 @@ const AboutPage = () => {
   );
 };
 
-export default AboutPage;
+export default About;

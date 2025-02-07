@@ -1,3 +1,4 @@
+// src/Pages/CharacterSelections.jsx
 import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,15 +7,14 @@ import {
   Swords, 
   Search, 
   X, 
-  Filter,
-  ArrowLeftRight
+  Filter
 } from 'lucide-react';
-import PropTypes from 'prop-types';
-
-// Import components
 import CharacterCard from '../Components/CharacterCard';
+import { RecentlyViewed } from '../Components/RecentlyViewed';
+import { SelectedCharacters } from '../Components/SelectedCharacters';
+import { useCharacterContext } from '../context/CharacterContext';
+import { useAPIRequest } from '../utils/apiFetcher';
 
-// Stat icons mapping
 const statIcons = {
   strength: Swords,
   speed: Swords, 
@@ -22,9 +22,16 @@ const statIcons = {
   durability: Swords 
 };
 
-const CharacterSelection = ({ characters, universe }) => {
-  const [selectedCharacter, setSelectedCharacter] = useState(null);
-  const [opponentCharacter, setOpponentCharacter] = useState(null);
+const CharacterSelections = () => {
+  const navigate = useNavigate();
+  const { 
+    selectedCharacters, 
+    selectCharacter, 
+    deselectCharacter,
+    addToRecentlyViewed 
+  } = useCharacterContext();
+
+  // Local state for UI
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
@@ -35,61 +42,54 @@ const CharacterSelection = ({ characters, universe }) => {
     minDurability: 0
   });
 
-  const navigate = useNavigate();
+  // Fetch characters data
+  const { data: characters = [] } = useAPIRequest('fetchCharacters');
 
   // Memoized filtered and sorted characters
   const filteredCharacters = useMemo(() => {
+    if (!characters) return [];
+
     let result = characters.filter(char => {
-      // Name search filter
       const nameMatch = char.name.toLowerCase().includes(searchTerm.toLowerCase());
       
-      // Stats filters
       const meetsMinStats = 
-        char.stats.strength >= filters.minStrength &&
-        char.stats.speed >= filters.minSpeed &&
-        char.stats.intelligence >= filters.minIntelligence &&
-        char.stats.durability >= filters.minDurability;
+        parseInt(char.powerstats.strength) >= filters.minStrength &&
+        parseInt(char.powerstats.speed) >= filters.minSpeed &&
+        parseInt(char.powerstats.intelligence) >= filters.minIntelligence &&
+        parseInt(char.powerstats.durability) >= filters.minDurability;
       
       return nameMatch && meetsMinStats;
     });
 
-    // Apply sorting if selected
     if (sortBy) {
-      result = [...result].sort((a, b) => b.stats[sortBy] - a.stats[sortBy]);
+      result = [...result].sort((a, b) => 
+        parseInt(b.powerstats[sortBy]) - parseInt(a.powerstats[sortBy])
+      );
     }
 
     return result;
   }, [characters, searchTerm, sortBy, filters]);
 
   const handleCharacterSelect = useCallback((character) => {
-    setSelectedCharacter(character);
-    if (opponentCharacter?._id === character._id) {
-      setOpponentCharacter(null);
+    const isSelected = selectedCharacters.some(char => char.id === character.id);
+    if (isSelected) {
+      deselectCharacter(character);
+    } else if (selectedCharacters.length < 2) {
+      selectCharacter(character);
+      addToRecentlyViewed(character);
     }
-  }, [opponentCharacter]);
+  }, [selectedCharacters, selectCharacter, deselectCharacter, addToRecentlyViewed]);
 
-  const handleOpponentSelect = useCallback((character) => {
-    setOpponentCharacter(character);
-  }, []);
-
-  const handleStartFight = useCallback(() => {
-    if (selectedCharacter && opponentCharacter) {
-      navigate('/fights/simulate', {
+  const handleProceedToFight = useCallback(() => {
+    if (selectedCharacters.length === 2) {
+      navigate('/fight-setup', {
         state: {
-          char1Id: selectedCharacter._id,
-          char2Id: opponentCharacter._id
+          char1Id: selectedCharacters[0].id,
+          char2Id: selectedCharacters[1].id
         }
       });
     }
-  }, [selectedCharacter, opponentCharacter, navigate]);
-
-  const handleSwapCharacters = useCallback(() => {
-    if (selectedCharacter && opponentCharacter) {
-      const temp = selectedCharacter;
-      setSelectedCharacter(opponentCharacter);
-      setOpponentCharacter(temp);
-    }
-  }, [selectedCharacter, opponentCharacter]);
+  }, [selectedCharacters, navigate]);
 
   return (
     <motion.main
@@ -106,9 +106,9 @@ const CharacterSelection = ({ characters, universe }) => {
             className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
-            <span>Back to Universe Selection</span>
+            <span>Back</span>
           </button>
-          <h1 className="text-3xl font-bold">{universe} Universe</h1>
+          <h1 className="text-3xl font-bold">Character Selection</h1>
         </div>
 
         {/* Search and Filter Bar */}
@@ -152,8 +152,6 @@ const CharacterSelection = ({ characters, universe }) => {
               className={`p-2 rounded-lg transition-colors duration-300 ${
                 showFilters ? 'bg-green-500 text-white' : 'bg-gray-800 text-gray-300'
               }`}
-              aria-label="Toggle filters"
-              aria-expanded={showFilters}
             >
               <Filter className="w-5 h-5" />
             </button>
@@ -188,112 +186,63 @@ const CharacterSelection = ({ characters, universe }) => {
                       }))}
                       className="w-full"
                     />
-                    <div className="text-sm text-gray-400 text-right">
+                    <span className="text-sm text-gray-400">
                       {filters[`min${stat.charAt(0).toUpperCase() + stat.slice(1)}`]}
-                    </div>
+                    </span>
                   </div>
                 ))}
-              </div>
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={() => setFilters({
-                    minStrength: 0,
-                    minSpeed: 0,
-                    minIntelligence: 0,
-                    minDurability: 0
-                  })}
-                  className="px-4 py-2 text-sm bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
-                >
-                  Reset Filters
-                </button>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Character Selection */}
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Choose Your Character</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <AnimatePresence>
-                {filteredCharacters.map((character) => (
-                  <CharacterCard
-                    key={character._id}
-                    character={character}
-                    isSelected={selectedCharacter?._id === character._id}
-                    onSelect={() => handleCharacterSelect(character)}
-                  />
-                ))}
-              </AnimatePresence>
-            </div>
-          </div>
+        {/* Selected Characters */}
+        <SelectedCharacters />
 
-          {/* Opponent Selection */}
-          <div>
-            <h2 className="text-2xl font-bold mb-4">Choose Your Opponent</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <AnimatePresence>
-                {filteredCharacters
-                  .filter(char => char._id !== selectedCharacter?._id)
-                  .map((character) => (
-                    <CharacterCard
-                      key={character._id}
-                      character={character}
-                      isSelected={opponentCharacter?._id === character._id}
-                      onSelect={() => handleOpponentSelect(character)}
-                    />
-                  ))}
-              </AnimatePresence>
-            </div>
-          </div>
+        {/* Character Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-8">
+          <AnimatePresence>
+            {filteredCharacters.map((character) => (
+              <motion.div
+                key={character.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+              >
+                <CharacterCard
+                  character={character}
+                  isSelected={selectedCharacters.some(char => char.id === character.id)}
+                  onSelect={() => handleCharacterSelect(character)}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
 
-        {/* Character Comparison and Fight Button */}
-        {selectedCharacter && opponentCharacter && (
+        {/* Fight Button */}
+        {selectedCharacters.length === 2 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4"
+            className="fixed bottom-8 left-1/2 transform -translate-x-1/2"
           >
             <button
-              onClick={handleSwapCharacters}
-              className="p-4 bg-gray-700 text-white rounded-full hover:bg-gray-600
-                         transition-colors duration-300"
-              aria-label="Swap Characters"
-            >
-              <ArrowLeftRight className="w-6 h-6" />
-            </button>
-            <button
-              onClick={handleStartFight}
+              onClick={handleProceedToFight}
               className="flex items-center space-x-2 px-8 py-4 bg-green-500 text-white
-                         rounded-full text-xl font-bold hover:bg-green-600 
-                         transition-colors duration-300"
+                       rounded-full text-xl font-bold hover:bg-green-600 
+                       transition-colors duration-300"
             >
               <Swords className="w-6 h-6" />
               <span>Start Fight!</span>
             </button>
           </motion.div>
         )}
+
+        {/* Recently Viewed */}
+        <RecentlyViewed />
       </div>
     </motion.main>
   );
 };
 
-CharacterSelection.propTypes = {
-  characters: PropTypes.arrayOf(PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string.isRequired,
-    universe: PropTypes.string.isRequired,
-    stats: PropTypes.shape({
-      strength: PropTypes.number.isRequired,
-      speed: PropTypes.number.isRequired,
-      intelligence: PropTypes.number.isRequired,
-      durability: PropTypes.number.isRequired
-    }).isRequired
-  })).isRequired,
-  universe: PropTypes.string.isRequired
-};
-
-export default CharacterSelection;
+export default CharacterSelections;

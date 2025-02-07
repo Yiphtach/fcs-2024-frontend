@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import Leaderboard from './pages/Leaderboard';
 import { CharacterProvider } from './context/CharacterContext';
 import './App.css';
 
@@ -11,6 +12,7 @@ import HomePage from './pages/HomePage';
 import Characters from './pages/Characters';
 import About from './pages/About';
 import CharacterDetails from './pages/CharacterDetails';
+
 
 // Lazy loaded components for less frequently accessed pages
 const FightResults = lazy(() => import('./pages/FightResults'));
