@@ -1,245 +1,136 @@
-import PropTypes from 'prop-types';
+// Characters.jsx
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import CharacterList from '../components/CharacterList';
+import { fetchCharacterById } from '../utils/ApiFetcher';
 
-function CharacterList({
-  characters = [],
-  currentPage = 1,
-  totalPages = 1,
-  onEdit = () => {},
-  onDelete = () => {},
-  onPageChange = () => {},
-  onCreateNew = () => {}
-}) {
-  const handleDelete = (characterId) => {
-    // Confirm deletion via a modal or confirm dialog
-    const confirmed = window.confirm('Are you sure you want to delete this character?');
-    if (confirmed) {
-      onDelete(characterId);
-    }
-  };
+const Characters = () => {
+  const navigate = useNavigate();
+  const [characters, setCharacters] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const renderPagination = () => {
-    const pages = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pages.push(
-        <button
-          key={i}
-          onClick={() => onPageChange(i)}
-          style={{
-            ...styles.paginationLink,
-            ...(i === currentPage ? styles.activePaginationLink : {})
-          }}
-          aria-label={`Go to page ${i}`}
-        >
-          {i}
-        </button>
+  // Number of characters per page
+  const PAGE_SIZE = 10;
+
+  useEffect(() => {
+    loadCharacters();
+  }, [currentPage]);
+
+  const loadCharacters = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // For demonstration, let's load some sample characters
+      // In production, this would be replaced with your actual API call
+      const sampleIds = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+      const charactersData = await Promise.all(
+        sampleIds.map(async (id) => {
+          const characterData = await fetchCharacterById(id);
+          const transformedCharacter = {
+            _id: id,
+            name: characterData.name,
+            universe: characterData.biography?.publisher || 'Unknown',
+            stats: {
+              strength: parseInt(characterData.powerstats?.strength) || 0,
+              speed: parseInt(characterData.powerstats?.speed) || 0,
+              durability: parseInt(characterData.powerstats?.durability) || 0,
+              power: parseInt(characterData.powerstats?.power) || 0,
+              combat: parseInt(characterData.powerstats?.combat) || 0,
+              intelligence: parseInt(characterData.powerstats?.intelligence) || 0
+            },
+            wins: 0, // These would come from your backend
+            losses: 0,
+            totalFights: 0,
+            winRatio: 0,
+            lossRatio: 0
+          };
+          return transformedCharacter;
+        })
       );
+
+      setCharacters(charactersData);
+      // In a real application, total pages would come from the API
+      setTotalPages(Math.ceil(charactersData.length / PAGE_SIZE));
+    } catch (err) {
+      console.error('Error loading characters:', err);
+      setError('Failed to load characters. Please try again later.');
+    } finally {
+      setLoading(false);
     }
-    return pages;
   };
 
-  return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Character List</h1>
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
-      {/* Table of Characters */}
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Universe</th>
-            <th>Strength</th>
-            <th>Speed</th>
-            <th>Durability</th>
-            <th>Power</th>
-            <th>Combat</th>
-            <th>Intelligence</th>
-            <th>Wins</th>
-            <th>Losses</th>
-            <th>Total Fights</th>
-            <th>Win Ratio</th>
-            <th>Loss Ratio</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {characters.map((character) => (
-            <tr key={character._id}>
-              <td>{character.name}</td>
-              <td>{character.universe}</td>
-              <td>{character.stats?.strength}</td>
-              <td>{character.stats?.speed}</td>
-              <td>{character.stats?.durability}</td>
-              <td>{character.stats?.power}</td>
-              <td>{character.stats?.combat}</td>
-              <td>{character.stats?.intelligence}</td>
-              <td>{character.wins}</td>
-              <td>{character.losses}</td>
-              <td>{character.totalFights}</td>
-              <td>{character.winRatio}</td>
-              <td>{character.lossRatio}</td>
-              <td>
-                {/* Edit Button */}
-                <button
-                  onClick={() => onEdit(character._id)}
-                  style={styles.actionButton}
-                  aria-label={`Edit ${character.name}`}
-                >
-                  Edit
-                </button>
-                {/* Delete Button */}
-                <button
-                  onClick={() => handleDelete(character._id)}
-                  style={styles.actionButton}
-                  aria-label={`Delete ${character.name}`}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  const handleEdit = (characterId) => {
+    navigate(`/character/${characterId}`);
+  };
 
-      {/* Pagination Controls */}
-      <div style={styles.pagination} role="navigation" aria-label="Pagination">
-        {/* Previous Button */}
+  const handleDelete = async (characterId) => {
+    try {
+      // In a real application, you would call your API to delete the character
+      // await deleteCharacter(characterId);
+      
+      // Remove character from local state
+      setCharacters(prevCharacters => 
+        prevCharacters.filter(char => char._id !== characterId)
+      );
+    } catch (err) {
+      console.error('Error deleting character:', err);
+      setError('Failed to delete character. Please try again later.');
+    }
+  };
+
+  const handleCreateNew = () => {
+    navigate('/character-selection');
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
+        <h2 className="text-2xl font-bold mb-4">Error</h2>
+        <p className="text-red-400 mb-4">{error}</p>
         <button
-          onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
-          style={{
-            ...styles.paginationLink,
-            ...styles.navButton,
-            ...(currentPage === 1 ? styles.disabled : {})
-          }}
-          disabled={currentPage === 1}
-          aria-label="Previous page"
+          onClick={loadCharacters}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
         >
-          Previous
-        </button>
-
-        {/* Page Numbers */}
-        {renderPagination()}
-
-        {/* Next Button */}
-        <button
-          onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
-          style={{
-            ...styles.paginationLink,
-            ...styles.navButton,
-            ...(currentPage === totalPages ? styles.disabled : {})
-          }}
-          disabled={currentPage === totalPages}
-          aria-label="Next page"
-        >
-          Next
+          Retry
         </button>
       </div>
+    );
+  }
 
-      {/* Create New Character Button */}
-      <button
-        onClick={onCreateNew}
-        style={styles.createButton}
-        aria-label="Create new character"
-      >
-        Create New Character
-      </button>
+  // Calculate the current page's characters
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const endIndex = startIndex + PAGE_SIZE;
+  const currentCharacters = characters.slice(startIndex, endIndex);
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-4">
+      <CharacterList
+        characters={currentCharacters}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onPageChange={handlePageChange}
+        onCreateNew={handleCreateNew}
+      />
     </div>
   );
-}
-
-// Inline Styles (For demonstration; typically, a separate CSS file is recommended)
-const styles = {
-  container: {
-    fontFamily: 'Arial, sans-serif',
-    padding: '20px',
-  },
-  title: {
-    fontSize: '36px',
-    marginBottom: '20px',
-    textAlign: 'center',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    marginBottom: '20px',
-    border: '1px solid #ddd',
-  },
-  pagination: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '10px',
-    marginTop: '20px',
-  },
-  paginationLink: {
-    padding: '10px 20px',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    textDecoration: 'none',
-    borderRadius: '5px',
-    transition: 'background-color 0.3s ease',
-    cursor: 'pointer',
-    border: 'none',
-    outline: 'none',
-  },
-  activePaginationLink: {
-    backgroundColor: '#388E3C',
-  },
-  navButton: {
-    // Additional styling for navigation buttons (if needed)
-  },
-  disabled: {
-    pointerEvents: 'none',
-    backgroundColor: '#ddd',
-    color: '#999',
-  },
-  actionButton: {
-    margin: '0 5px',
-    padding: '8px 12px',
-    backgroundColor: '#4CAF50',
-    border: 'none',
-    color: 'white',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
-  },
-  createButton: {
-    padding: '10px 20px',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    transition: 'background-color 0.3s ease',
-    cursor: 'pointer',
-    marginTop: '10px',
-  },
 };
 
-CharacterList.propTypes = {
-  characters: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      universe: PropTypes.string.isRequired,
-      stats: PropTypes.shape({
-        strength: PropTypes.number,
-        speed: PropTypes.number,
-        durability: PropTypes.number,
-        power: PropTypes.number,
-        combat: PropTypes.number,
-        intelligence: PropTypes.number,
-      }),
-      wins: PropTypes.number,
-      losses: PropTypes.number,
-      totalFights: PropTypes.number,
-      winRatio: PropTypes.number,
-      lossRatio: PropTypes.number,
-    })
-  ),
-  currentPage: PropTypes.number,
-  totalPages: PropTypes.number,
-  onEdit: PropTypes.func,
-  onDelete: PropTypes.func,
-  onPageChange: PropTypes.func,
-  onCreateNew: PropTypes.func,
-};
-
-export default CharacterList;
+export default Characters;
