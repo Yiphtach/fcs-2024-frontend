@@ -14,7 +14,7 @@ import CharacterDetails from './pages/CharacterDetails';
 // Lazy loaded components
 const FightResults = lazy(() => import('./pages/FightResults'));
 const FightSetup = lazy(() => import('./pages/FightSetup'));
-const Gallery = lazy(() => import('./pages/Gallery'));
+const Gallery = lazy(() => import('./pages/GalleryPage'));
 const Leaderboards = lazy(() => import('./pages/Leaderboards'));
 
 // Loading Component

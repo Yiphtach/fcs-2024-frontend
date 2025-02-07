@@ -227,5 +227,11 @@ StatBar.propTypes = {
   color: PropTypes.string
 };
 
+<StatBar
+    current={75}
+    max={100}
+    label="Health"
+    color="bg-green-500"  // Using Tailwind color classes
+/>
 
 export default FightResults;
