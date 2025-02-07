@@ -1,9 +1,7 @@
-// apiFetcher.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-const BASE_URL = '/api'; // This will point to your backend API
+const BASE_URL = '/api';
 
-// Helper function for making API requests
 const fetchAPI = async (endpoint, options = {}) => {
   try {
     const response = await fetch(`${BASE_URL}${endpoint}`, {
@@ -70,28 +68,53 @@ export const fetchCharacterDetails = async (id) => {
   }
 };
 
-// Example usage of error handling and loading states
+// Fixed useAPIRequest hook with proper dependency handling
 export const useAPIRequest = (apiFunction, ...params) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const result = await apiFunction(...params);
-        setData(result);
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Memoize the fetchData function to prevent unnecessary re-renders
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const result = await apiFunction(...params);
+      setData(result);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiFunction, params]); // Properly declare dependencies
 
+  useEffect(() => {
     fetchData();
-  }, [apiFunction, ...params]);
+  }, [fetchData]); // Only depend on the memoized function
 
   return { data, loading, error };
+};
+
+// Alternative hook if you need more control over when the request is made
+export const useAPIRequestManual = (apiFunction) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const execute = useCallback(async (...params) => {
+    try {
+      setLoading(true);
+      const result = await apiFunction(...params);
+      setData(result);
+      setError(null);
+      return result;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [apiFunction]);
+
+  return { data, loading, error, execute };
 };

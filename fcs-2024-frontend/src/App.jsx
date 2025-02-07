@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import { CharacterProvider } from './context/CharacterContext';
 import './App.css';
 
 // Regular imports for frequently accessed pages
@@ -21,7 +22,7 @@ const CharacterSelections = lazy(() => import('./pages/CharacterSelection'));
 // Loading Component with animation
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center h-screen">
-    <div className="loading-spinner"></div>
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     <p className="ml-3 text-lg font-medium">Loading awesome content...</p>
   </div>
 );
@@ -64,14 +65,14 @@ class ErrorBoundary extends React.Component {
             </p>
             <details className="mb-4">
               <summary className="cursor-pointer text-blue-600">Technical Details</summary>
-              <pre className="mt-2 p-4 bg-gray-100 rounded overflow-auto">
+              <pre className="mt-2 p-4 bg-gray-100 rounded overflow-auto text-sm">
                 {this.state.error && this.state.error.toString()}
                 {this.state.errorInfo && this.state.errorInfo.componentStack}
               </pre>
             </details>
             <button 
               onClick={() => window.location.reload()}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition-colors"
             >
               Refresh Page
             </button>
@@ -157,53 +158,66 @@ const NotFound = () => (
 
 const App = () => {
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     // Preload components marked for preloading
     const preloadComponents = async () => {
-      const preloadRoutes = ROUTES.filter(route => route.preload);
-      await Promise.all(preloadRoutes.map(route => {
-        if (typeof route.element.type === 'function') {
-          return route.element.type();
-        }
-        return Promise.resolve();
-      }));
-      setLoading(false);
+      try {
+        const preloadRoutes = ROUTES.filter(route => route.preload);
+        await Promise.all(preloadRoutes.map(route => {
+          if (typeof route.element.type === 'function') {
+            return route.element.type();
+          }
+          return Promise.resolve();
+        }));
+      } catch (error) {
+        console.error('Error preloading components:', error);
+      } finally {
+        setLoading(false);
+        setInitialized(true);
+      }
     };
 
     preloadComponents();
   }, []);
 
+  if (!initialized) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <Router>
       <ErrorBoundary>
-        <div className="flex flex-col min-h-screen">
-          <Header />
-          <main className="flex-grow">
-            <Suspense fallback={<LoadingSpinner />}>
-              {loading ? (
-                <LoadingSpinner />
-              ) : (
-                <Routes>
-                  {ROUTES.map(({ path, element, exact }) => (
-                    <Route 
-                      key={path}
-                      path={path}
-                      element={
-                        <ErrorBoundary>
-                          {element}
-                        </ErrorBoundary>
-                      }
-                      exact={exact}
-                    />
-                  ))}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              )}
-            </Suspense>
-          </main>
-          <Footer />
-        </div>
+        <CharacterProvider>
+          <div className="flex flex-col min-h-screen bg-gray-50">
+            <Header />
+            <main className="flex-grow container mx-auto px-4 py-8">
+              <Suspense fallback={<LoadingSpinner />}>
+                {loading ? (
+                  <LoadingSpinner />
+                ) : (
+                  <Routes>
+                    {ROUTES.map(({ path, element, exact }) => (
+                      <Route 
+                        key={path}
+                        path={path}
+                        element={
+                          <ErrorBoundary>
+                            {element}
+                          </ErrorBoundary>
+                        }
+                        exact={exact}
+                      />
+                    ))}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                )}
+              </Suspense>
+            </main>
+            <Footer />
+          </div>
+        </CharacterProvider>
       </ErrorBoundary>
     </Router>
   );
