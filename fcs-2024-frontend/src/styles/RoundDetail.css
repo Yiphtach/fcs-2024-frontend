@@ -1,0 +1,57 @@
+.round-detail {
+    background-color: #1f2937;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.round-detail h3 {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.fighters-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.fighter-corner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 45%;
+}
+
+.fighter-corner.blue h4 {
+    color: #3b82f6;
+}
+
+.fighter-corner.red h4 {
+    color: #ef4444;
+}
+
+.fighter-corner h4 {
+    font-weight: semibold;
+    margin-bottom: 0.5rem;
+}
+
+.fighter-corner p {
+    color: #9ca3af;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

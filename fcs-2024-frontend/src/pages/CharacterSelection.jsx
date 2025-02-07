@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, memo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -7,204 +7,19 @@ import {
   Search, 
   X, 
   Filter,
-  ArrowLeftRight,
-  Shield,
-  Brain,
-  Zap
+  ArrowLeftRight
 } from 'lucide-react';
 import PropTypes from 'prop-types';
+
+// Import components
+import CharacterCard from '../Components/CharacterCard';
 
 // Stat icons mapping
 const statIcons = {
   strength: Swords,
-  speed: Zap,
-  intelligence: Brain,
-  durability: Shield
-};
-
-// Character card animations
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
-  exit: { opacity: 0, scale: 0.9 }
-};
-
-const StatBar = ({ label, value, icon: Icon, color }) => (
-  <div className="flex items-center gap-2" title={`${label}: ${value}`}>
-    <Icon className={`w-4 h-4 ${color}`} aria-label={label} />
-    <div className="flex-1 bg-gray-700 h-2 rounded-full overflow-hidden">
-      <div 
-        className={`h-full ${color} transition-all duration-500`}
-        style={{ width: `${value}%` }}
-        role="progressbar"
-        aria-valuenow={value}
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-label={`${label} stat value`}
-      />
-    </div>
-    <span className="text-sm font-medium w-8">{value}</span>
-  </div>
-);
-
-StatBar.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.number.isRequired,
-  icon: PropTypes.elementType.isRequired,
-  color: PropTypes.string.isRequired
-};
-
-const CharacterCard = memo(({ character, isSelected, onSelect, showStats = true }) => {
-  return (
-    <motion.div
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.98 }}
-      className={`
-        relative rounded-xl overflow-hidden cursor-pointer
-        transition-all duration-300 bg-gray-800 h-full
-        ${isSelected ? 'ring-4 ring-green-400' : 'hover:ring-2 hover:ring-green-400/50'}
-      `}
-      onClick={onSelect}
-    >
-      <div className="aspect-w-3 aspect-h-4">
-        <img
-          src={character.imageUrl}
-          alt={character.name}
-          className="object-cover w-full h-full"
-          loading="lazy"
-        />
-      </div>
-      <div className="p-4 bg-gradient-to-t from-black/90 via-black/70 to-transparent absolute bottom-0 w-full">
-        <h3 className="text-xl font-bold text-white mb-2">{character.name}</h3>
-        {showStats && (
-          <div className="space-y-2">
-            <StatBar 
-              label="Character Strength" 
-              value={character.stats.strength}
-              icon={statIcons.strength}
-              color="text-red-400"
-            />
-            <StatBar 
-              label="Character Speed" 
-              value={character.stats.speed}
-              icon={statIcons.speed}
-              color="text-blue-400"
-            />
-            <StatBar 
-              label="Character Intelligence" 
-              value={character.stats.intelligence}
-              icon={statIcons.intelligence}
-              color="text-purple-400"
-            />
-            <StatBar 
-              label="Character Durability" 
-              value={character.stats.durability}
-              icon={statIcons.durability}
-              color="text-yellow-400"
-            />
-          </div>
-        )}
-      </div>
-    </motion.div>
-  );
-});
-
-
-CharacterCard.propTypes = {
-  character: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string.isRequired,
-    stats: PropTypes.shape({
-      strength: PropTypes.number.isRequired,
-      speed: PropTypes.number.isRequired,
-      intelligence: PropTypes.number.isRequired,
-      durability: PropTypes.number.isRequired
-    }).isRequired
-  }).isRequired,
-  isSelected: PropTypes.bool.isRequired,
-  onSelect: PropTypes.func.isRequired,
-  showStats: PropTypes.bool
-};
-
-CharacterCard.displayName = 'CharacterCard';
-
-const compareStats = (stat1, stat2) => {
-  if (stat1 > stat2) return 'text-green-400';
-  if (stat1 < stat2) return 'text-red-400';
-  return 'text-gray-400';
-};
-
-const CharacterComparison = ({ character1, character2 }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="fixed bottom-24 left-1/2 transform -translate-x-1/2 
-                 bg-gray-800/95 backdrop-blur-sm p-6 rounded-xl shadow-xl"
-    >
-      <h3 className="text-xl font-bold mb-4 text-center">Battle Analysis</h3>
-      <div className="grid grid-cols-3 gap-4 min-w-[600px]">
-        <div className="text-right">
-          <p className={compareStats(character1.stats.strength, character2.stats.strength)}>
-            {character1.stats.strength}
-          </p>
-          <p className={compareStats(character1.stats.speed, character2.stats.speed)}>
-            {character1.stats.speed}
-          </p>
-          <p className={compareStats(character1.stats.intelligence, character2.stats.intelligence)}>
-            {character1.stats.intelligence}
-          </p>
-          <p className={compareStats(character1.stats.durability, character2.stats.durability)}>
-            {character1.stats.durability}
-          </p>
-        </div>
-        <div className="text-center text-gray-400">
-          <p>Strength</p>
-          <p>Speed</p>
-          <p>Intelligence</p>
-          <p>Durability</p>
-        </div>
-        <div className="text-left">
-          <p className={compareStats(character2.stats.strength, character1.stats.strength)}>
-            {character2.stats.strength}
-          </p>
-          <p className={compareStats(character2.stats.speed, character1.stats.speed)}>
-            {character2.stats.speed}
-          </p>
-          <p className={compareStats(character2.stats.intelligence, character1.stats.intelligence)}>
-            {character2.stats.intelligence}
-          </p>
-          <p className={compareStats(character2.stats.durability, character1.stats.durability)}>
-            {character2.stats.durability}
-          </p>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-CharacterComparison.propTypes = {
-  character1: PropTypes.shape({
-    stats: PropTypes.shape({
-      strength: PropTypes.number.isRequired,
-      speed: PropTypes.number.isRequired,
-      intelligence: PropTypes.number.isRequired,
-      durability: PropTypes.number.isRequired
-    }).isRequired
-  }).isRequired,
-  character2: PropTypes.shape({
-    stats: PropTypes.shape({
-      strength: PropTypes.number.isRequired,
-      speed: PropTypes.number.isRequired,
-      intelligence: PropTypes.number.isRequired,
-      durability: PropTypes.number.isRequired
-    }).isRequired
-  }).isRequired
+  speed: Swords, 
+  intelligence: Swords,  
+  durability: Swords 
 };
 
 const CharacterSelection = ({ characters, universe }) => {
@@ -212,13 +27,14 @@ const CharacterSelection = ({ characters, universe }) => {
   const [opponentCharacter, setOpponentCharacter] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     minStrength: 0,
     minSpeed: 0,
     minIntelligence: 0,
     minDurability: 0
   });
-  const [showFilters, setShowFilters] = useState(false);
+
   const navigate = useNavigate();
 
   // Memoized filtered and sorted characters
@@ -435,42 +251,35 @@ const CharacterSelection = ({ characters, universe }) => {
 
         {/* Character Comparison and Fight Button */}
         {selectedCharacter && opponentCharacter && (
-          <>
-            <CharacterComparison 
-              character1={selectedCharacter} 
-              character2={opponentCharacter} 
-            />
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4"
-            >
-              <button
-                onClick={handleSwapCharacters}
-                className="p-4 bg-gray-700 text-white rounded-full hover:bg-gray-600
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="fixed bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4"
+          >
+            <button
+              onClick={handleSwapCharacters}
+              className="p-4 bg-gray-700 text-white rounded-full hover:bg-gray-600
                          transition-colors duration-300"
-                aria-label="Swap Characters"
-              >
-                <ArrowLeftRight className="w-6 h-6" />
-              </button>
-              <button
-                onClick={handleStartFight}
-                className="flex items-center space-x-2 px-8 py-4 bg-green-500 text-white
+              aria-label="Swap Characters"
+            >
+              <ArrowLeftRight className="w-6 h-6" />
+            </button>
+            <button
+              onClick={handleStartFight}
+              className="flex items-center space-x-2 px-8 py-4 bg-green-500 text-white
                          rounded-full text-xl font-bold hover:bg-green-600 
                          transition-colors duration-300"
-              >
-                <Swords className="w-6 h-6" />
-                <span>Start Fight!</span>
-              </button>
-            </motion.div>
-          </>
+            >
+              <Swords className="w-6 h-6" />
+              <span>Start Fight!</span>
+            </button>
+          </motion.div>
         )}
       </div>
     </motion.main>
   );
 };
 
-// PropTypes definitions...
 CharacterSelection.propTypes = {
   characters: PropTypes.arrayOf(PropTypes.shape({
     _id: PropTypes.string.isRequired,

