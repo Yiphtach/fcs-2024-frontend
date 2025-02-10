@@ -5,6 +5,8 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import { CharacterProvider } from './context/CharacterContext';
 import './App.css';
+import Leaderboard from './components/Leaderboard/Leaderboard';
+import FightSetup from './components/Fight/FightSetup';
 
 // Regular imports for frequently accessed pages
 import HomePage from './pages/HomePage';
@@ -15,7 +17,6 @@ import CharacterDetails from './pages/CharacterDetails';
 
 // Lazy loaded components for less frequently accessed pages
 const FightResults = lazy(() => import('./pages/FightResults'));
-const FightSetup = lazy(() => import('./pages/FightSetup'));
 const Gallery = lazy(() => import('./pages/GalleryPage'));
 const Leaderboards = lazy(() => import('./pages/Leaderboards'));
 const CharacterSelections = lazy(() => import('./pages/CharacterSelection'));
@@ -199,19 +200,21 @@ const App = () => {
                   <LoadingSpinner />
                 ) : (
                   <Routes>
-                    {ROUTES.map(({ path, element, exact }) => (
-                      <Route 
-                        key={path}
-                        path={path}
-                        element={
-                          <ErrorBoundary>
-                            {element}
-                          </ErrorBoundary>
-                        }
-                        exact={exact}
-                      />
-                    ))}
-                    <Route path="*" element={<NotFound />} />
+            {ROUTES.map(({ path, element, exact }) => (
+              <Route 
+                key={path}
+                path={path}
+                element={
+                  <ErrorBoundary>
+                    {element}
+                  </ErrorBoundary>
+                }
+                exact={exact}
+              />
+            ))}
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/fight" element={<FightSetup />} />
+            <Route path="*" element={<NotFound />} />
                   </Routes>
                 )}
               </Suspense>
