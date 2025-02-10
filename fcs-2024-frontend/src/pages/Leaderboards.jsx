@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Leaderboard from '../components/Leaderboard'; // Assuming you'll split the components
+import Leaderboard from '../components/Leaderboard/Leaderboard'; // Assuming you'll split the components
 
 const LeaderboardsPage = () => {
   const [searchParams] = useSearchParams();

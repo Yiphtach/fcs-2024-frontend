@@ -103,6 +103,13 @@ const HomePage = () => {
           className="relative bg-gradient-to-r from-blue-600 to-purple-600 text-white py-24 overflow-hidden" 
           aria-label="Hero Section"
         >
+          <Link 
+  to="/characters" 
+  className="inline-flex items-center gap-2 bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-all"
+  aria-label="Browse Characters"
+>
+  Browse Characters
+</Link>
           {/* Background Animation */}
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute w-96 h-96 -top-20 -left-20 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob" />

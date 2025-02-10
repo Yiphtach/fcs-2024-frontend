@@ -2,12 +2,12 @@ import PropTypes from 'prop-types';
 
 const LeaderboardRow = ({ rank, character }) => {
     return (
-        <tr>
-            <td>{rank}</td>
-            <td>{character.name}</td>
-            <td>{character.wins}</td>
-            <td>{character.totalFights}</td>
-            <td>{(character.winRatio * 100).toFixed(1)}%</td>
+        <tr className="border border-gray-600 text-center">
+            <td className="py-2 px-4">{rank}</td>
+            <td className="py-2 px-4">{character.name}</td>
+            <td className="py-2 px-4">{character.wins}</td>
+            <td className="py-2 px-4">{character.totalFights}</td>
+            <td className="py-2 px-4">{(character.winRatio * 100).toFixed(1)}%</td>
         </tr>
     );
 };

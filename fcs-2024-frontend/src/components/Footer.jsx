@@ -15,7 +15,7 @@ const footerLinks = [
 const socialLinks = [
   { 
     Icon: Github, 
-    href: 'https://github.com/yourusername/fight-simulation-app', 
+    href: 'https://github.com/fcs-2024/fight-simulation-app', 
     label: 'GitHub Repository'
   },
   { 

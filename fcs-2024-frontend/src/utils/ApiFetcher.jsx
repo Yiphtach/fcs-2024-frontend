@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const API_BASE_URL = "http://localhost:3000/api";
+const API_BASE_URL = "https://fcs-backend-production.up.railway.app/api";
 
 export const fetchLeaderboard = async () => {
   try {
