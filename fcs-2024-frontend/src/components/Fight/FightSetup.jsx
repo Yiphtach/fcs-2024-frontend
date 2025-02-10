@@ -34,26 +34,35 @@ export const FightSetup = () => {
   };
 
   return (
-      <div className="fight-setup-container">
-          <h2>⚔️ Set Up a Fight</h2>
-          <div className="fight-setup">
-              <select onChange={e => setCharacter1(e.target.value)}>
-                  <option value="">Select Fighter 1</option>
-                  {characters.map(char => <option key={char._id} value={char._id}>{char.name}</option>)}
-              </select>
+    <div className="max-w-lg mx-auto bg-primary text-white p-6 rounded-lg shadow-lg mt-8">
+    <h2 className="text-2xl font-bold text-center mb-4">⚔️ Set Up a Fight</h2>
+    <div className="flex flex-col gap-4">
+        <select className="p-2 rounded bg-secondary text-white" onChange={e => setCharacter1(e.target.value)}>
+            <option value="">Select Fighter 1</option>
+            {characters.map(char => <option key={char._id} value={char._id}>{char.name}</option>)}
+        </select>
 
-              <select onChange={e => setCharacter2(e.target.value)}>
-                  <option value="">Select Fighter 2</option>
-                  {characters.map(char => <option key={char._id} value={char._id}>{char.name}</option>)}
-              </select>
+        <select className="p-2 rounded bg-secondary text-white" onChange={e => setCharacter2(e.target.value)}>
+            <option value="">Select Fighter 2</option>
+            {characters.map(char => <option key={char._id} value={char._id}>{char.name}</option>)}
+        </select>
 
-              <input type="number" value={rounds} min="1" max="10" onChange={e => setRounds(e.target.value)} />
+        <input 
+            type="number" 
+            className="p-2 rounded bg-gray-800 text-white"
+            value={rounds} 
+            min="1" 
+            max="10" 
+            onChange={e => setRounds(e.target.value)} 
+        />
 
-              <button onClick={startFight}>Start Fight</button>
-          </div>
+        <button className="bg-accent text-white py-2 rounded font-bold hover:bg-yellow-600 transition" onClick={startFight}>
+            Start Fight
+        </button>
+    </div>
 
-          {fightResult && <FightSimulation result={fightResult} />}
-      </div>
+    {fightResult && <FightSimulation result={fightResult} />}
+</div>
   );
 };
 
