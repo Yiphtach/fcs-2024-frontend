@@ -9,6 +9,54 @@ import {
   ImageOff
 } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { fetchLeaderboard, fetchFightResult } from '../../utils/ApiFetcher';
+import FightSimulation from './FightSimulation';
+
+
+export const FightSetup = () => {
+  const [characters, setCharacters] = useState([]);
+  const [character1, setCharacter1] = useState("");
+  const [character2, setCharacter2] = useState("");
+  const [rounds, setRounds] = useState(3);
+  const [fightResult, setFightResult] = useState(null);
+
+  useEffect(() => {
+      fetchLeaderboard().then(data => setCharacters(data.leaderboard || []));
+  }, []);
+
+  const startFight = async () => {
+      if (!character1 || !character2 || character1 === character2) {
+          alert("Please select two different fighters.");
+          return;
+      }
+      const result = await fetchFightResult(character1, character2, rounds);
+      setFightResult(result);
+  };
+
+  return (
+      <div className="fight-setup-container">
+          <h2>⚔️ Set Up a Fight</h2>
+          <div className="fight-setup">
+              <select onChange={e => setCharacter1(e.target.value)}>
+                  <option value="">Select Fighter 1</option>
+                  {characters.map(char => <option key={char._id} value={char._id}>{char.name}</option>)}
+              </select>
+
+              <select onChange={e => setCharacter2(e.target.value)}>
+                  <option value="">Select Fighter 2</option>
+                  {characters.map(char => <option key={char._id} value={char._id}>{char.name}</option>)}
+              </select>
+
+              <input type="number" value={rounds} min="1" max="10" onChange={e => setRounds(e.target.value)} />
+
+              <button onClick={startFight}>Start Fight</button>
+          </div>
+
+          {fightResult && <FightSimulation result={fightResult} />}
+      </div>
+  );
+};
+
 
 // Universe Card Component
 const UniverseCard = ({ universe, isSelected, onSelect }) => {
@@ -108,7 +156,7 @@ UniverseSearch.propTypes = {
   onSearch: PropTypes.func.isRequired
 };
 
-const FightSetup = () => {
+const UniverseSelector = () => {
   const [selectedUniverse, setSelectedUniverse] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -241,4 +289,4 @@ const FightSetup = () => {
   );
 };
 
-export default FightSetup;
+export default UniverseSelector;

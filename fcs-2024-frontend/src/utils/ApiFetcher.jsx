@@ -1,10 +1,35 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const BASE_URL = '/api';
+const API_BASE_URL = "http://localhost:3000/api";
+
+export const fetchLeaderboard = async () => {
+  try {
+      const response = await fetch(`${API_BASE_URL}/leaderboard`);
+      return await response.json();
+  } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      return { leaderboard: [] };
+  }
+};
+
+export const fetchFightResult = async (character1Id, character2Id, rounds = 3) => {
+  try {
+      const response = await fetch(`${API_BASE_URL}/fights/simulate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ character1Id, character2Id, rounds })
+      });
+      return await response.json();
+  } catch (error) {
+      console.error("Error simulating fight:", error);
+      return null;
+  }
+};
+
 
 const fetchAPI = async (endpoint, options = {}) => {
   try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
