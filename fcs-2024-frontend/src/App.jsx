@@ -212,6 +212,7 @@ const App = () => {
                 exact={exact}
               />
             ))}
+            <Route path="/" element={<HomePage />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/fight" element={<FightSetup />} />
             <Route path="*" element={<NotFound />} />
